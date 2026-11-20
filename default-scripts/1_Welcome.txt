@@ -1,0 +1,12 @@
+Welcome to GlidePrompter. [PAUSE]<br>
+This is a sample script. Every line in the file is one paragraph on the prompter.<br>
+Press Space to start scrolling, and Space again to pause. [BREATHE]<br>
+Use Shift and the arrow keys to change the speed. Tap the arrow keys to nudge the text, or hold them to glide.<br>
+Words in square brackets are stage cues. They show up smaller and in colour, so the speaker never reads them out loud. [SMILE]<br>
+[SLIDE 2]<br>
+A cue that starts with SLIDE becomes a blue badge, so you know when to change the slide.<br>
+Lost your place? Press Ctrl+F in the Control window, type a few words you just heard, and press Enter. The prompter glides right to them.<br>
+Each speaker gets their own text size, colours, speed, position and timer. Press Ctrl+1 to 9 to switch between speakers.<br>
+To add your own script, type a name under Speakers and click Add, or drop a .txt file into the scripts folder.<br>
+Press ? at any time to see every keyboard shortcut. [PAUSE]<br>
+Good luck with your talk!

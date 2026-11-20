@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'">
+<title>GlidePrompter Control</title>
+<link rel="stylesheet" href="control.css">
+</head>
+<body>
+<header id="toolbar">
+  <div class="group icons">
+    <button id="btnPlay" class="icon" title="Play / Pause [Space]">
+      <svg id="icPlay" viewBox="0 0 40 40"><path d="M13 8 L32 20 L13 32 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>
+      <svg id="icPause" viewBox="0 0 40 40" hidden><path d="M12 8h5v24h-5zM23 8h5v24h-5z" fill="currentColor"/></svg>
+    </button>
+    <button id="btnAlign" class="icon" title="Align text left / centre [A]">
+      <svg viewBox="0 0 40 40"><path id="alignPath" d="M6 9h28M6 16h20M6 23h28M6 30h20" stroke="currentColor" stroke-width="3"/></svg>
+    </button>
+    <button id="btnMirrorH" class="icon" title="Mirror horizontally [H]">
+      <svg viewBox="0 0 40 40"><path d="M20 4v32" stroke="currentColor" stroke-width="2.5" stroke-dasharray="3 3"/><path d="M16 10H8v20h8M24 10h8v20h-8" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+    </button>
+    <button id="btnMirrorV" class="icon" title="Mirror vertically [V]">
+      <svg viewBox="0 0 40 40"><path d="M4 20h32" stroke="currentColor" stroke-width="2.5" stroke-dasharray="3 3"/><path d="M10 16V8h20v8M10 24v8h20v-8" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+    </button>
+    <button id="btnGuide" class="icon" title="Reading line [L]">
+      <svg viewBox="0 0 40 40"><path d="M5 12l9 8-9 8zM35 12l-9 8 9 8z" fill="currentColor"/></svg>
+    </button>
+  </div>
+
+  <label class="swatch"><input type="color" id="bg"><span>Background color</span></label>
+  <label class="swatch"><input type="color" id="fg"><span>Text color</span></label>
+
+  <label class="slider"><input type="range" id="fontSize" min="30" max="180" step="1"><span>Text size: <b id="fontSizeV"></b>px</span></label>
+  <label class="slider"><input type="range" id="margin" min="0" max="40" step="1"><span>Margin: <b id="marginV"></b>%</span></label>
+  <label class="slider"><input type="range" id="speed" min="1" max="50" step="1"><span>Speed: <b id="speedV"></b></span></label>
+
+  <div class="group timerbox">
+    <div id="timer">00:00</div>
+    <div class="row">
+      <button id="btnTimer" class="pill" title="Start / stop timer [T]">Start</button>
+      <button id="btnTimerReset" class="pill" title="Reset timer [Shift+T]">Reset</button>
+    </div>
+  </div>
+</header>
+
+<div id="body">
+  <aside id="sidebar">
+    <div class="side-title">Speakers</div>
+    <ul id="speakers"></ul>
+    <form id="newForm">
+      <input id="newName" placeholder="New speaker name" autocomplete="off">
+      <button class="pill" type="submit">+ Add</button>
+    </form>
+    <div class="side-title">Output window</div>
+    <div class="outctl">
+      <button id="btnFull" class="pill wide" title="Fullscreen on the selected monitor [F]">Fullscreen</button>
+      <button id="btn1080" class="pill wide" title="Resize the output window to exactly 1920×1080 pixels">Size 1920×1080</button>
+      <label class="check"><input type="checkbox" id="onTop"> Always on top</label>
+      <select id="display" title="Monitor for the output window"></select>
+      <button id="btnShowOut" class="pill wide">Bring output to front</button>
+    </div>
+    <div class="side-title">More settings</div>
+    <div class="more">
+      <label class="slider small"><input type="range" id="readingLine" min="0.05" max="0.9" step="0.01"><span>Reading line: <b id="readingLineV"></b>%</span></label>
+      <label class="slider small"><input type="range" id="lineHeight" min="1" max="3" step="0.05"><span>Line spacing: <b id="lineHeightV"></b></span></label>
+      <label class="slider small"><input type="range" id="timerSize" min="16" max="160" step="1"><span>Timer size: <b id="timerSizeV"></b>px</span></label>
+      <label class="check"><input type="checkbox" id="showTimer"> Show timer</label>
+      <label class="check"><input type="checkbox" id="showProgress"> Progress bar [P]</label>
+      <button id="btnSaveDefault" class="pill wide" title="Use this speaker's look as the default for everyone">Save look as default</button>
+      <button id="btnResetDefault" class="pill wide" title="Drop this speaker's own look and use the default">Reset look to default</button>
+      <button id="btnFolder" class="pill wide" title="Choose the folder with the .txt scripts">Change scripts folder…</button>
+      <div id="folder" class="muted"></div>
+    </div>
+  </aside>
+
+  <main id="main">
+    <div id="tabs">
+      <button class="tab active" data-tab="script">Script</button>
+      <button class="tab" data-tab="edit">Edit</button>
+      <div id="speakerTitle"></div>
+      <div id="search" title="Search a word the speaker says (Ctrl+F). Enter = jump prompter there, Shift+Enter = previous, Esc = clear">
+        <svg viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13 13l5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <input id="q" placeholder="Find spoken words…  Ctrl+F" autocomplete="off" spellcheck="false">
+        <span id="qCount"></span>
+        <button id="qPrev" class="qbtn" title="Previous match (Shift+Enter)">▲</button>
+        <button id="qNext" class="qbtn" title="Next match (Enter)">▼</button>
+        <button id="qClear" class="qbtn" title="Clear (Esc)">✕</button>
+      </div>
+      <div id="progressText" class="muted"></div>
+      <button id="btnHelp" class="pill" title="Keyboard shortcuts [?]">? Shortcuts</button>
+    </div>
+    <div id="progressBar"><div id="progressFill"></div></div>
+    <section id="tab-script" class="tabpane active"><div id="overview"></div></section>
+    <section id="tab-edit" class="tabpane">
+      <div class="editbar">
+        <span class="muted">One line = one paragraph. Cues in [BRACKETS] are styled automatically.</span>
+        <span id="dirty" class="muted"></span>
+        <button id="btnRevert" class="pill">Revert</button>
+        <button id="btnSave" class="pill primary">Save (Ctrl+S)</button>
+      </div>
+      <textarea id="editor" spellcheck="false"></textarea>
+    </section>
+  </main>
+</div>
+
+<div id="help" hidden>
+  <div class="helpbox">
+    <h2>Keyboard shortcuts</h2>
+    <p class="muted">Work in this window and in the output window.</p>
+    <table id="helpTable"></table>
+    <button id="btnHelpClose" class="pill">Close</button>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script src="shared/parse.js"></script>
+<script src="shared/keys.js"></script>
+<script src="control.js"></script>
+</body>
+</html>
