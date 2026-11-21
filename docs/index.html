@@ -163,6 +163,20 @@ nav .btn { height: 34px; padding: 0 12px; font-size: 13px; }
 @media (min-width: 1040px) { .bento { grid-template-columns: repeat(4, 1fr); } .bento .wide { grid-column: span 2; } }
 .tile { position: relative; padding: 22px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; transition: border-color .2s; }
 .tile:hover { border-color: var(--border-strong); }
+.bento .full { grid-column: 1 / -1; }
+.follow { display: grid; gap: 28px; align-items: center; }
+@media (min-width: 900px) { .follow { grid-template-columns: 1fr 1.15fr; padding: 30px; } }
+.follow h3 { font-size: 22px; }
+.follow .list { margin-top: 6px; }
+.follow .demo { margin-top: 0; padding-top: 0; }
+.fw.said { color: color-mix(in srgb, #fff 72%, #5aa9ff); transition: color .25s; }
+#tpFollow .tp-content { transition: transform .55s cubic-bezier(.25,.6,.3,1); }
+.fstat { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 13px; color: var(--muted-fg); flex-wrap: wrap; }
+.fstat .fdot { width: 8px; height: 8px; border-radius: 50%; background: #71717a; transition: background .2s, box-shadow .2s; }
+.fstat.on .fdot { background: #4cd964; box-shadow: 0 0 0 4px rgba(76,217,100,.15); }
+.fstat .meter { flex: 1; min-width: 60px; max-width: 180px; height: 6px; border-radius: 3px; background: var(--muted); overflow: hidden; }
+.fstat .meter i { display: block; height: 100%; width: 4%; background: linear-gradient(90deg, #4cd964, #ffd60a); transition: width .09s linear; }
+.fstat .kbdhint { margin-left: auto; }
 .tile p { color: var(--muted-fg); font-size: 14px; }
 .tile .ic { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: var(--primary-soft); border: 1px solid rgba(230,43,30,.3); color: #ff7b6f; margin-bottom: 6px; }
 .tile .ic svg { width: 18px; height: 18px; }
@@ -430,6 +444,25 @@ footer a:hover { color: var(--fg); }
     </div>
 
     <div class="bento">
+      <div class="card tile full follow reveal">
+        <div>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></div>
+          <span class="badge" style="margin-bottom:8px;align-self:flex-start"><span class="dot"></span>New in v1.2</span>
+          <h3>Follow mode: the script follows your voice</h3>
+          <p>Press <kbd>M</kbd> and just talk. The prompter moves while you speak and stops when you pause. Speech recognition runs offline on your computer, so audio never leaves it.</p>
+          <ul class="list">
+            <li><svg><use href="#i-check"/></svg><span><b>Ad-libs are fine.</b> It waits, then picks up where the script continues.</span></li>
+            <li><svg><use href="#i-check"/></svg><span><b>Skip or repeat a line</b> and it finds its place again.</span></li>
+            <li><svg><use href="#i-check"/></svg><span><b>Words already said get a faint tint,</b> so you always see where you are.</span></li>
+            <li><svg><use href="#i-check"/></svg><span><b>Take over any time</b> with the arrow keys, search or the wheel. The timer starts on your first word.</span></li>
+          </ul>
+          <p style="margin-top:10px;font-size:13px">Windows app, English. One-time voice pack download (about 150 MB) from inside the app.</p>
+        </div>
+        <div class="demo">
+          <div id="tpFollow" class="tp" role="img" aria-label="Demo: the prompter follows a speaker's voice and tints the words already said" style="--tp-size:4.6cqw"></div>
+          <div class="fstat" id="fStat"><span class="fdot"></span><span id="fLabel" style="min-width:150px">Listening</span><span class="meter"><i id="fMeter"></i></span><span class="kbdhint">Follow mode <kbd>M</kbd></span></div>
+        </div>
+      </div>
       <div class="card tile wide reveal">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M4 12h10M4 17h13"/></svg></div>
         <h3>Buttery smooth scrolling</h3>
@@ -701,6 +734,7 @@ footer a:hover { color: var(--fg); }
       <div class="key" data-k="HV">Mirror horizontal / vertical<kbd>H V</kbd></div>
       <div class="key" data-k="LP">Reading line / progress bar<kbd>L P</kbd></div>
       <div class="key" data-k="A">Align left / centre<kbd>A</kbd></div>
+      <div class="key" data-k="M">Follow mode on / off (Windows app)<kbd>M</kbd></div>
       <div class="key" data-k="F">Fullscreen output<kbd>F</kbd></div>
       <div class="key" data-k="CB">Bold / italic / underline (editor)<kbd>Ctrl B I U</kbd></div>
     </div>
@@ -715,6 +749,7 @@ footer a:hover { color: var(--fg); }
       <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Why does Windows warn me when I start the .exe?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>The app isn't code-signed, because signing certificates are expensive. Click <b>More info → Run anyway</b>. You can also read the source on GitHub and build the .exe yourself with <code>npm run dist</code>.</p></div></div></div>
       <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>What does a script file look like?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>It's a plain <code>.txt</code> file where every line is one paragraph. Name it like <code>3_Jane_Doe.txt</code>. The number sets the order and the <kbd>Ctrl</kbd> <kbd>3</kbd> shortcut. Cues go in [BRACKETS] and formatting uses the markup shown above. Files that end each line with <code>&lt;br&gt;</code> (CuePrompter's paste format) also work.</p></div></div></div>
       <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>The web version stops scrolling when I cover the prompter window. Why?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>Browsers pause windows that are minimised or fully covered, to save power. Put the prompter window on a second screen or next to the control window. GlidePrompter shows a warning when this happens. The Windows app turns this pausing off, so it stays smooth even when OBS captures a hidden window.</p></div></div></div>
+      <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Does Follow mode send my voice anywhere?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>No. Speech recognition runs on your own computer, and audio never leaves it. The first time, the app downloads an English voice pack (about 150 MB, checked before use, removable any time). After that it works offline. It uses <a href="https://github.com/k2-fsa/sherpa-onnx">sherpa-onnx</a> with NVIDIA's CC-BY-4.0 streaming FastConformer model. Follow mode is in the Windows app only, not the web version. A lavalier or a feed from the sound desk works better than the laptop's own microphone.</p></div></div></div>
       <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Can I use it with a beam-splitter / glass teleprompter?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>Yes. Press <kbd>H</kbd> to mirror horizontally (and <kbd>V</kbd> for vertically). Each speaker remembers this setting.</p></div></div></div>
       <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Is there a macOS or Linux version?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>Not as a desktop download yet. They're planned in <a href="https://github.com/AmineChr54/glideprompter/issues/1">#1 (macOS)</a> and <a href="https://github.com/AmineChr54/glideprompter/issues/2">#2 (Linux)</a>. Until then, the web app runs in any modern browser on any system, and <code>npm start</code> from the source code works on macOS and Linux too.</p></div></div></div>
     </div>
@@ -914,6 +949,43 @@ No destination. No reviews. No blue dot.
 You might find a bakery. You might find a mural. You might find a chess game. [PAUSE]
 **Thank you.** [BOW]`.split('\n');
 
+/* ---------- Follow mode demo: scripted, shows pace, pauses, an ad-lib and the tint ---------- */
+(() => {
+  const root = $('#tpFollow'); if (!root) return;
+  const clean = l => l.replace(/\[[^\]]*\]/g, '').replace(/\*\*|\*|==|__|\{[a-z]+\}|\{\/\}/g, '').trim();
+  const lines = TALK.slice(1, 6).map(clean).filter(Boolean);
+  root.innerHTML = '<div class="tp-view"><div class="tp-content"></div></div><div class="tp-guide"><i class="l"></i><i class="r"></i></div>';
+  const content = $('.tp-content', root), words = [];
+  for (const l of lines) {
+    const p = document.createElement('p');
+    l.split(/\s+/).forEach((w, i) => { if (i) p.append(' '); const s = document.createElement('span'); s.className = 'fw'; s.textContent = w; p.append(s); words.push(s); });
+    content.append(p);
+  }
+  const stat = $('#fStat'), label = $('#fLabel'), meter = $('#fMeter');
+  const adlibAt = words.findIndex(w => /decade\.$/.test(w.textContent)) + 1;
+  let k = 0, speaking = false, adlibDone = false, timer, meterT, running = false;
+  const place = i => { const w = words[Math.min(i, words.length - 1)]; content.style.transform = `translateY(${root.clientHeight * .35 - (w.offsetTop + w.offsetHeight / 2)}px)`; };
+  const voice = (on, text) => { speaking = on; stat.classList.toggle('on', on); label.textContent = text || (on ? 'Hearing voice' : 'Listening'); };
+  const tickMeter = () => { meter.style.width = (speaking ? 35 + Math.random() * 55 : 2 + Math.random() * 5) + '%'; };
+  const later = (f, ms) => { timer = setTimeout(f, ms); };
+  const step = () => {
+    if (!running) return;
+    if (k >= words.length) { voice(false); return later(() => { words.forEach(w => w.classList.remove('said')); k = 0; adlibDone = false; place(0); later(step, 1200); }, 2200); }
+    if (k === adlibAt && !adlibDone) { adlibDone = true; voice(true, 'Hearing voice (ad-lib)'); return later(() => { voice(false); later(step, 500); }, 1800); }
+    voice(true);
+    const w = words[k++]; w.classList.add('said'); place(k);
+    const dur = 150 + w.textContent.length * 32;
+    if (/[.!?]$/.test(w.textContent)) later(() => { voice(false); later(step, 750); }, dur);
+    else later(step, dur + (/,$/.test(w.textContent) ? 220 : 0));
+  };
+  const start = () => { if (running) return; running = true; meterT = setInterval(tickMeter, 90); step(); };
+  const stop = () => { running = false; clearTimeout(timer); clearInterval(meterT); voice(false); };
+  addEventListener('resize', () => place(k));
+  if (reduced) { for (let i = 0; i < 14; i++) words[i].classList.add('said'); k = 14; requestAnimationFrame(() => place(k)); return; }
+  requestAnimationFrame(() => place(0));
+  new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? start() : stop())).observe(root);
+})();
+
 /* ---------- hero: live prompter, rendered at the display's refresh rate ---------- */
 (() => {
   const tp = new TP($('#tpHero'), { lines: TALK, speed: 31, timer: true });
@@ -1083,7 +1155,7 @@ You might find a bakery. You might find a mural. You might find a chess game. [P
     if (k === ' ') return 'Space';
     if (k === 'ArrowUp' || k === 'ArrowDown') return e.shiftKey ? 'SArr' : 'Arr';
     return { PageUp: 'Pg', PageDown: 'Pg', Home: 'HE', End: 'HE', Enter: 'Enter', '+': 'PM', '-': 'PM', '=': 'PM', ',': 'CM', '.': 'CM' }[k]
-      || (/^t$/i.test(k) ? 'T' : /^[hv]$/i.test(k) ? 'HV' : /^[lp]$/i.test(k) ? 'LP' : /^a$/i.test(k) ? 'A' : /^f$/i.test(k) ? 'F' : null);
+      || (/^t$/i.test(k) ? 'T' : /^[hv]$/i.test(k) ? 'HV' : /^[lp]$/i.test(k) ? 'LP' : /^a$/i.test(k) ? 'A' : /^f$/i.test(k) ? 'F' : /^m$/i.test(k) ? 'M' : null);
   };
   document.addEventListener('keydown', e => {
     if (!inView || e.target.closest('input, textarea, .tp, button, [role=tab]')) return;

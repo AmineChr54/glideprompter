@@ -36,6 +36,9 @@ html, body {
 .fc-green { color: #4cd964; } .fc-blue { color: #5aa9ff; } .fc-purple { color: #c084fc; }
 .fc-white { color: #ffffff; } .fc-gray { color: #8e8e93; }
 
+/* Follow mode: words already said get a faint tint, so the speaker sees where they are */
+::highlight(tp-said) { color: color-mix(in srgb, var(--fg) 72%, #5aa9ff); }
+
 /* Stage cues: smaller, coloured, never mistaken for script text */
 .cue {
   font-size: 0.6em; font-weight: bold; text-transform: uppercase;

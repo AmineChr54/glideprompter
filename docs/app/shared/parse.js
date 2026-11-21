@@ -96,5 +96,25 @@
     return ranges;
   }
 
-  window.TPParse = { toLines, toFileText, lineToHtml, findAll, normQuery, plainWords, COLORS };
+  // Rendered words of a paragraph element, for Follow mode: [{text, range}]. Whitespace and stage
+  // cues separate words, and formatting tags don't (same rule as TPFollowMatch.lineWords).
+  function domWords(el) {
+    const out = [];
+    let w = null;
+    const end = () => { if (w && /[\p{L}\p{N}]/u.test(w.text)) out.push(w); w = null; };
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.parentElement && node.parentElement.closest('.cue')) { end(); continue; }
+      const t = node.nodeValue;
+      for (let i = 0; i < t.length; i++) {
+        if (/\s/.test(t[i])) { end(); continue; }
+        if (!w) w = { text: '', sn: node, so: i };
+        w.text += t[i]; w.en = node; w.eo = i + 1;
+      }
+    }
+    end();
+    return out.map(x => { const r = document.createRange(); r.setStart(x.sn, x.so); r.setEnd(x.en, x.eo); return { text: x.text, range: r }; });
+  }
+
+  window.TPParse = { toLines, toFileText, lineToHtml, findAll, normQuery, plainWords, domWords, COLORS };
 })();

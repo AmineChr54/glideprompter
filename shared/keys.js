@@ -2,7 +2,7 @@
 // Uses e.key for symbols (works on German QWERTZ too) and e.code for digits.
 (function () {
   // Actions handled by the main process (everything else goes to the Output renderer).
-  const MAIN_ACTIONS = new Set(['speaker', 'fullscreen', 'onTop', 'saveDefault', 'resetDefault', 'size1080', 'focusSearch', 'searchNav']);
+  const MAIN_ACTIONS = new Set(['speaker', 'fullscreen', 'onTop', 'saveDefault', 'resetDefault', 'size1080', 'focusSearch', 'searchNav', 'followToggle']);
 
   function keyToAction(e, phase) {
     const k = e.key;
@@ -50,6 +50,7 @@
       case 'v': return { a: 'toggle', key: 'mirrorV' };
       case 'f': return { a: 'fullscreen' };
       case 'a': return { a: 'toggleAlign' };
+      case 'm': return { a: 'followToggle' };
     }
     return null;
   }
@@ -69,6 +70,7 @@
     ['H / V', 'Mirror horizontal / vertical'],
     ['F', 'Output fullscreen on / off'],
     ['A', 'Align text left / centre'],
+    ['M', 'Follow mode on / off (the script follows the speaker’s voice)'],
     ['Ctrl + F', 'Search a word the speaker says'],
     ['Enter / Shift + Enter', 'Jump prompter to next / previous match (also F3)'],
     ['Ctrl + 1…9', 'Switch speaker'],

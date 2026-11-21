@@ -8,6 +8,7 @@
     fontFamily: 'Arial', fontWeight: 400, letterSpacing: 0,
     timerMode: 'up', timerTarget: 600, timerWarn: 60, timerOvertime: true,
     timerPos: 'tr', timerFg: '#ffffff', timerBg: '#000000',
+    followHighlight: true,       // Follow mode: tint the words already said
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = DEFAULTS;
   else root.TPDefaults = DEFAULTS;

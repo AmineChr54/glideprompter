@@ -54,6 +54,7 @@
     guide.classList.toggle('hidden', !S.showGuide);
     progressEl.classList.toggle('hidden', !S.showProgress);
     timerEl.classList.toggle('hidden', S.showTimer === false);
+    fSaid = -2;
   }
 
   function measure() {
@@ -63,6 +64,7 @@
     readY = S.readingLine * window.innerHeight;
     const total = content.offsetHeight;
     maxY = Math.max(0, total - lineH);
+    fGeo = null;
   }
 
   function paraAt(y) {
@@ -114,6 +116,8 @@
       timerRunning = false; timerAccum = p.timerMs || 0;
     }
     lastRendered = NaN; timerShown = '';
+    if (!same && following) setFollow(false);
+    sendFollowWords();
     document.fonts && document.fonts.ready.then(() => relayout(true));
   }
 
@@ -133,10 +137,14 @@
     const now = performance.now();
     switch (a.a) {
       case 'togglePlay':
+        if (following) { setFollow(false); break; }          // Play takes back manual control
         if (!playing && targetY() >= maxY - 0.5) break;
         playing = !playing; break;
       case 'pause': playing = false; break;
-      case 'pauseAll': playing = false; held.clear(); if (timerRunning) toggleTimer(); break;
+      case 'pauseAll': playing = false; held.clear(); if (timerRunning) toggleTimer(); setFollow(false); break;
+      case 'followSet': setFollow(!!a.on); break;
+      case 'follow': onFollowCursor(a); break;
+      case 'followSpeaking': onFollowSpeaking(a.on); break;
       case 'nudgePress':
         T += a.dir * lineH;
         held.set(a.dir, now);
@@ -148,8 +156,8 @@
       case 'para': jumpPara(a.d); break;
       case 'gotoPara': if (tops.length) glideTo(tops[clamp(a.i, 0, tops.length - 1)]); break;
       case 'findGo': findGo(a.q, a.para, a.nth); break;
-      case 'home': glideTo(0); break;
-      case 'end': glideTo(maxY); playing = false; break;
+      case 'home': setFollow(false); glideTo(0); break;
+      case 'end': setFollow(false); glideTo(maxY); playing = false; break;
       case 'setBy': set(a.key, S[a.key] + a.d); break;
       case 'set': set(a.key, a.value); break;
       case 'toggle': set(a.key, !S[a.key]); break;
@@ -160,6 +168,8 @@
       case 'timerAdd': setTimerMs(timerMs() + a.ms); break;
       case 'applySettings': S = { ...a.settings }; relayout(true); emitSettings(); break;
     }
+    // Moving the prompter by hand while following: let the move finish, then follow from there.
+    if (following && MANUAL.has(a.a)) fManual = true;
     forceReport = true;
   }
   function glideTo(y) { T += clamp(y, 0, maxY) - targetY(); }
@@ -191,6 +201,124 @@
     timerAccum = Math.max(0, Number(ms) || 0); timerStart = performance.now(); timerShown = '';
   }
 
+  // ---------------- follow mode ----------------
+  // The speech engine (main process -> utilityProcess) tells us which script word was just spoken.
+  // TPFollowMotion turns that into smooth motion in word space, and the word geometry below maps it to y.
+  const MANUAL = new Set(['nudgePress', 'scrollBy', 'para', 'gotoPara', 'findGo']);
+  const motion = new TPFollowMotion.FollowMotion();
+  let fSaid = -1;
+  let following = false, fManual = false, fState = 'off', fSpeaking = false, fTimerArmed = false;
+  let fWords = [], fParaOf = [], fRanges = [], fGeo = null;
+  const hasHL = typeof Highlight !== 'undefined' && !!CSS.highlights;
+  // Tint everything up to the last recognised word (not the predicted position: only what was really heard).
+  function markSaid() {
+    if (!hasHL) return;
+    const upto = following && S.followHighlight !== false ? Math.min(motion.cursor, fRanges.length - 1) : -1;
+    if (upto === fSaid) return;
+    fSaid = upto;
+    if (upto < 0) { CSS.highlights.delete('tp-said'); return; }
+    const r = document.createRange(), end = fRanges[upto];
+    r.setStart(content, 0); r.setEnd(end.endContainer, end.endOffset);
+    CSS.highlights.set('tp-said', new Highlight(r));
+  }
+
+  function sendFollowWords() {
+    const pos = following ? posAtY(targetY()) : 0;
+    fWords = []; fParaOf = []; fRanges = []; fGeo = null; fSaid = -2;
+    paras.forEach((p, i) => TPParse.domWords(p).forEach(w => { fWords.push(w.text); fParaOf.push(i); fRanges.push(w.range); }));
+    motion.setWords(fWords);
+    if (following) motion.reset(Math.min(pos, fWords.length));
+    tp.action({ a: 'followWords', file, words: fWords, paraOf: fParaOf, anchor: following ? Math.floor(pos) : null });
+  }
+  // yS[i]: scroll y when word i starts. Within a line, progress is spread by letters, so the line
+  // being spoken rises smoothly through the reading line (from half a line below to half above).
+  function geo() {
+    if (fGeo) return fGeo;
+    const n = fRanges.length, yS = new Float64Array(n + 1);
+    const lineOf = new Float64Array(n), chars = new Float64Array(n);
+    const prs = new Map();
+    for (let i = 0; i < n; i++) {
+      const pi = fParaOf[i], r = fRanges[i];
+      if (!prs.has(pi)) prs.set(pi, paras[pi].getBoundingClientRect());
+      const rr = r.getClientRects()[0] || r.getBoundingClientRect(), pr = prs.get(pi);
+      const dy = S.mirrorV ? pr.bottom - rr.bottom : rr.top - pr.top;
+      lineOf[i] = tops[pi] + Math.max(0, Math.round((dy + rr.height / 2 - lineH / 2) / lineH)) * lineH;
+      chars[i] = fWords[i].length + 1;
+    }
+    for (let i = 0; i < n;) {
+      let j = i, tot = 0;
+      while (j < n && lineOf[j] === lineOf[i]) tot += chars[j++];
+      let acc = 0;
+      for (let k = i; k < j; k++) { yS[k] = lineOf[k] - lineH / 2 + (acc / tot) * lineH; acc += chars[k]; }
+      i = j;
+    }
+    yS[n] = n ? lineOf[n - 1] + lineH / 2 : 0;
+    fGeo = yS;
+    return yS;
+  }
+  function yOfPos(pos) {
+    const yS = geo(), n = yS.length - 1;
+    if (!n) return 0;
+    const i = clamp(Math.floor(pos), 0, n - 1), f = clamp(pos - i, 0, 1);
+    return yS[i] + f * (yS[i + 1] - yS[i]);
+  }
+  function posAtY(y) {
+    const yS = geo(), n = yS.length - 1;
+    if (!n) return 0;
+    let lo = 0, hi = n - 1;
+    while (lo < hi) { const m = (lo + hi + 1) >> 1; if (yS[m] <= y) lo = m; else hi = m - 1; }
+    const d = yS[lo + 1] - yS[lo];
+    return clamp(lo + (d > 0 ? (y - yS[lo]) / d : 0), 0, n);
+  }
+  function setFollow(on) {
+    if (on === following) return;
+    if (on && !fWords.length) { tp.action({ a: 'followOff' }); return; }
+    following = on; fManual = false;
+    if (on) {
+      playing = false; autoVel = 0;
+      const pos = posAtY(targetY());
+      motion.reset(pos);
+      fState = 'listening'; fSpeaking = false; fTimerArmed = !timerRunning;
+      tp.action({ a: 'followAnchor', word: Math.floor(pos) });
+    } else { fState = 'off'; fSpeaking = false; }
+    markSaid();
+    forceReport = true;
+  }
+  function onFollowCursor(a) {
+    if (!following || fManual) return;
+    const now = performance.now();
+    motion.setState(a.state, now);
+    if (a.word >= 0) motion.cursorAt(a.word, now, a.jump);
+    fState = a.state;
+  }
+  function onFollowSpeaking(on) {
+    if (!following) return;
+    motion.setSpeaking(on, performance.now());
+    fSpeaking = on;
+    if (on && fTimerArmed) { fTimerArmed = false; if (!timerRunning) toggleTimer(); }
+  }
+  // Called every frame while following.
+  function followFrame(dt, now) {
+    motion.step(dt, now);
+    markSaid();
+    if (fManual) {
+      // wait until the operator's move has settled, then continue from the new spot
+      if (T === 0 && s === 0 && v === 0 && glideVel === 0 && !held.size) {
+        fManual = false;
+        const pos = posAtY(base);
+        motion.reset(pos);
+        tp.action({ a: 'followAnchor', word: Math.floor(pos) });
+        forceReport = true;
+      }
+      return;
+    }
+    const want = yOfPos(motion.pos);
+    if (window.__followLog) window.__followLog.push([performance.timeOrigin + now, +motion.pos.toFixed(3), motion.speaking ? 1 : 0]);
+    const j = motion.takeJump();
+    if (j) s += yOfPos(j.from) - want;           // re-find: glide there with the spring instead of cutting
+    base = want;
+  }
+
   // ---------------- frame loop ----------------
   let last = performance.now(), lastRendered = NaN, lastProg = -1;
   let lastReport = 0, forceReport = true, lastReportKey = '';
@@ -214,6 +342,7 @@
     if (!glideTarget && Math.abs(glideVel) < 0.5) glideVel = 0;
 
     base += (autoVel + glideVel) * dt;
+    if (following) followFrame(dt, now);
 
     // critically damped spring for taps / jumps (exact solution, frame-rate independent)
     if (T !== 0 || s !== 0 || v !== 0) {
@@ -256,8 +385,9 @@
       progress: maxY ? y / maxY : 0,
       timerMs: Math.floor(timerMs()), timerRunning, playing, speed: S.speed, scrollPx: maxY,
       y, vw: window.innerWidth, vh: window.innerHeight,
+      following, fState: fManual ? 'manual' : fState, fSpeaking, fWord: following ? Math.floor(motion.pos) : -1,
     };
-    const key = [pos.para, pos.within.toFixed(3), Math.floor(r.timerMs / 1000), timerRunning, playing, S.speed, Math.round(maxY), Math.round(y), r.vw, r.vh].join('|');
+    const key = [pos.para, pos.within.toFixed(3), Math.floor(r.timerMs / 1000), timerRunning, playing, S.speed, Math.round(maxY), Math.round(y), r.vw, r.vh, following, r.fState, fSpeaking, r.fWord].join('|');
     if (key === lastReportKey && !forceReport) return;
     lastReportKey = key; forceReport = false;
     tp.report(r);
@@ -274,6 +404,7 @@
   window.addEventListener('wheel', (e) => {
     e.preventDefault();
     T += e.deltaMode === 1 ? e.deltaY * lineH / 3 : e.deltaY;
+    if (following) fManual = true;
   }, { passive: false });
   let resizeRaf = 0;
   window.addEventListener('resize', () => {

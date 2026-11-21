@@ -31,6 +31,7 @@
 - [Formatting & cues](#formatting--cues)
 - [Timer](#timer)
 - [Finding your place (search)](#finding-your-place-search)
+- [Follow mode (voice)](#follow-mode-voice)
 - [Using it with OBS or a stage monitor](#using-it-with-obs-or-a-stage-monitor)
 - [Keyboard shortcuts](#keyboard-shortcuts)
 - [Settings & profiles](#settings--profiles)
@@ -47,6 +48,7 @@
 - **Fonts.** Choose the font family, weight, letter spacing, line spacing, text and background colour, and the alignment.
 - **Inline formatting.** Mark words **bold**, *italic*, underlined, highlighted or coloured, with a toolbar and shortcuts in the editor.
 - **Count up / count down timer.** Each speaker has a target time and a warning window (yellow). The timer turns red at zero and can count overtime (`-00:12`). Choose its corner and colours, click it to type a time, or nudge it by ±30 s.
+- **Follow mode.** The script scrolls with the speaker's voice: it moves while they talk, stops when they pause, and finds its place again after ad-libs or skipped lines. Speech recognition runs offline on your computer (English, desktop app only).
 - **Word search.** Type what the speaker just said and press <kbd>Enter</kbd>. The prompter glides so those words land on the reading line.
 - **Stage cues.** `[PAUSE]`, `[SLIDE 3]` and similar cues are styled so they're never read out.
 - **Mirror modes** for beam-splitter glass, horizontally and/or vertically.
@@ -145,6 +147,20 @@ Press <kbd>Ctrl</kbd>+<kbd>F</kbd> and type a few words you just heard. Capitals
 - <kbd>Enter</kbd> glides the prompter so that match sits on the reading line. It starts with the first match at or after the current position.
 - Press <kbd>Enter</kbd> again for the next match and <kbd>Shift</kbd>+<kbd>Enter</kbd> for the previous one. <kbd>Esc</kbd> clears the search.
 
+## Follow mode (voice)
+
+Press <kbd>M</kbd> or the microphone button in the toolbar, and the prompter follows the speaker's voice.
+
+- **First use:** Follow mode needs the English voice pack. Download it once from **Follow mode** in the left panel (about 150 MB). It's stored in your user data folder, is checked before use, and can be removed again. After that, everything runs offline. Audio never leaves the computer.
+- **Microphone:** choose the input in the same panel. A lavalier or a feed from the sound desk works much better than the laptop's own microphone. The meter under the button shows the level.
+- **What it does:** the text glides at the speaker's pace while they talk, and stops within about a tenth of a second when they pause. If they ad-lib, it waits. If they skip ahead or go back, it jumps there once a few words in a row clearly match. While it is unsure it says *Searching…* and only creeps forward very slowly.
+- **Taking over:** the arrow keys, the mouse wheel, search and clicking a paragraph move the prompter, and Follow mode continues from the new spot. <kbd>Space</kbd> (Play), <kbd>Home</kbd>, <kbd>End</kbd> or <kbd>M</kbd> switch back to manual control.
+- The timer starts by itself when the speaker starts talking, unless it is already running.
+- In the Control window's prompter view, the word Follow mode thinks the speaker is on is highlighted.
+- **Tint the words already said** (on by default, per speaker): words that were recognised get a faint blue tint on the prompter, so the speaker sees where they are. Turn it off in the Follow mode panel.
+
+Under the hood it uses [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) and Silero VAD. The speech model is NVIDIA's [streaming FastConformer](https://huggingface.co/nvidia/stt_en_fastconformer_hybrid_large_streaming_multi) (CC-BY-4.0), converted to run at 80 ms look-ahead.
+
 ## Using it with OBS or a stage monitor
 
 **OBS:** Add a **Window Capture** source, pick **"[GlidePrompter.exe]: GlidePrompter Output"**, and set the capture method to **Windows 10 (1903 and up)**.
@@ -172,6 +188,7 @@ The shortcuts work in both windows. Press <kbd>?</kbd> in the app for this list.
 | <kbd>L</kbd> / <kbd>P</kbd> | Reading line / progress bar |
 | <kbd>H</kbd> / <kbd>V</kbd> | Mirror horizontal / vertical |
 | <kbd>A</kbd> | Align left / centre |
+| <kbd>M</kbd> | Follow mode on / off (the script follows the speaker’s voice) |
 | <kbd>F</kbd> | Output fullscreen |
 | <kbd>Ctrl</kbd>+<kbd>F</kbd> | Search for words the speaker said |
 | <kbd>Enter</kbd> / <kbd>Shift</kbd>+<kbd>Enter</kbd> | Jump to the next / previous match (also <kbd>F3</kbd>) |
@@ -221,8 +238,12 @@ shared/            Code shared by both windows and the web version
   keys.js          Keyboard shortcuts
   timer.js         Count up / count down display rules
   defaults.js      Default look and timer settings
+  follow-match.js  Follow mode: aligns recognised words with the script
+  follow-motion.js Follow mode: smooth, predictive scrolling from those words
+follow/            Follow mode (desktop): speech engine process, voice pack download, mic capture
+test/              Unit tests (npm test)
 web/bridge.js      Stands in for Electron in the browser (localStorage + BroadcastChannel)
-tools/             build-web.js (builds docs/app) and render-svg.js (renders the icon)
+tools/             build-web.js (builds docs/app), render-svg.js (renders the icon), follow/ (test talks, benchmarks, voice pack builder)
 default-scripts/   Sample scripts that are copied into the scripts folder on first run
 docs/              Website (GitHub Pages) and the built web app in docs/app/
 build/             App icon
