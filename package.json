@@ -1,6 +1,6 @@
 {
   "name": "glideprompter",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Smooth two-window teleprompter for live talks and OBS",
   "main": "main.js",
   "author": "Amine Cheikhrouhou",
@@ -9,12 +9,14 @@
   "private": true,
   "scripts": {
     "start": "electron .",
+    "test": "node --test",
     "dist": "electron-builder --win portable",
     "web": "node tools/build-web.js"
   },
   "devDependencies": {
     "electron": "^33.4.11",
-    "electron-builder": "^25.1.8"
+    "electron-builder": "^25.1.8",
+    "sherpa-onnx-node": "^2.0.2"
   },
   "productName": "GlidePrompter",
   "build": {
@@ -33,6 +35,7 @@
       "control.css",
       "control.js",
       "shared/**",
+      "follow/**",
       "build/icon.png",
       "default-scripts/**",
       "package.json"

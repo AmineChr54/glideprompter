@@ -10,4 +10,8 @@ contextBridge.exposeInMainWorld('tp', {
   changeFolder: () => ipcRenderer.invoke('changeFolder'),
   info: () => ipcRenderer.invoke('info'),
   on: (ch, fn) => ipcRenderer.on(ch, (_e, data) => fn(data)),
+  follow: true,                 // Follow mode exists here (the web version has no speech engine)
 });
+// Follow mode: the main process hands the Control window a MessagePort to the speech engine.
+// Ports can't cross the context bridge as arguments, so they go over window.postMessage.
+ipcRenderer.on('followPort', (e, data) => window.postMessage({ type: 'glideprompter-follow-port', data }, '*', e.ports));

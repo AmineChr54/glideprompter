@@ -403,7 +403,7 @@
   $('timerEdit').addEventListener('blur', () => endEditTimer(true));
 
   // ---------------- help ----------------
-  $('helpTable').innerHTML = TPKeys.HELP.map(([k, d]) => `<tr><td><kbd>${k}</kbd></td><td>${d}</td></tr>`).join('');
+  $('helpTable').innerHTML = TPKeys.HELP.filter(([k]) => k !== 'M' || tp.follow).map(([k, d]) => `<tr><td><kbd>${k}</kbd></td><td>${d}</td></tr>`).join('');
   const toggleHelp = (show) => { $('help').hidden = show === undefined ? !$('help').hidden : !show; };
   $('btnHelp').onclick = () => toggleHelp();
   $('btnHelpClose').onclick = () => toggleHelp(false);

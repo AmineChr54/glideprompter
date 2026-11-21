@@ -1,6 +1,6 @@
 // GlidePrompter – main process.
 // Two windows: "GlidePrompter Output" (captured by OBS) and "GlidePrompter Control".
-const { app, BrowserWindow, ipcMain, dialog, screen, powerSaveBlocker, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, screen, powerSaveBlocker, Menu, session } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -9,8 +9,15 @@ app.commandLine.appendSwitch('disable-renderer-backgrounding');
 app.commandLine.appendSwitch('disable-background-timer-throttling');
 app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
 app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion');
+// Test hook: TP_FOLLOW_WAV + TP_FOLLOW_FAKEMIC=1 presents the WAV as a real microphone (Chromium's fake capture device),
+// so the whole microphone path (getUserMedia, audio service, worklet) runs in real time.
+if (process.env.TP_FOLLOW_WAV && process.env.TP_FOLLOW_FAKEMIC) {
+  app.commandLine.appendSwitch('use-fake-device-for-media-stream');
+  app.commandLine.appendSwitch('use-file-for-fake-audio-capture', process.env.TP_FOLLOW_WAV + '%noloop');
+}
 
 const DEFAULTS = require('./shared/defaults.js');   // also used by the web version
+const { createFollowHost, ACTIONS: FOLLOW_ACTIONS } = require('./follow/host.js');
 const SETTING_KEYS = Object.keys(DEFAULTS);
 
 const CONFIG_FILE = () => path.join(app.getPath('userData'), 'config.json');
@@ -40,6 +47,7 @@ let outputReady = false, controlReady = false;
 let lastWritten = new Map(); // file -> text we wrote (ignore our own fs.watch events)
 let watcher = null;
 let quitting = false;
+let follow = null;        // Follow mode host (speech engine + voice pack), see follow/host.js
 
 // ---------------- persistence ----------------
 function readJson(file, fallback) {
@@ -242,6 +250,7 @@ function maybeStart() {
 
 // ---------------- main-level actions ----------------
 function handleMainAction(a) {
+  if (FOLLOW_ACTIONS.includes(a.a)) { follow.onAction(a); return; }
   switch (a.a) {
     case 'speaker': {
       const s = speakers.find(x => x.num === a.index + 1) || (speakers.some(x => x.num != null) ? null : speakers[a.index]);
@@ -325,7 +334,7 @@ ipcMain.on('report', (e, r) => {
   if (!r || !r.file || !speakers.some(s => s.file === r.file)) return;
   const p = sp(r.file);
   p.pos = r.pos; p.timerMs = r.timerMs; p.progress = r.progress;
-  if (r.file === current) sendCtl('report', r);
+  if (r.file === current) { sendCtl('report', r); follow.onReport(r); }
   else sendCtl('speakers', { list: speakerList(), current });
   saveProfilesSoon();
 });
@@ -378,7 +387,7 @@ ipcMain.handle('info', () => ({ scriptsDir: config.scriptsDir }));
 
 // ---------------- lifecycle ----------------
 app.whenReady().then(() => {
-  globalThis.TP_MAIN_ACTIONS = new Set(['speaker', 'speakerFile', 'fullscreen', 'onTop', 'display', 'size1080', 'showOutput', 'saveDefault', 'resetDefault', 'focusSearch', 'searchNav']);
+  globalThis.TP_MAIN_ACTIONS = new Set(['speaker', 'speakerFile', 'fullscreen', 'onTop', 'display', 'size1080', 'showOutput', 'saveDefault', 'resetDefault', 'focusSearch', 'searchNav', ...FOLLOW_ACTIONS]);
   Menu.setApplicationMenu(null);
   const saved = readJson(CONFIG_FILE(), null);
   // Only a folder the user explicitly picked ("Change scripts folder…") is remembered.
@@ -389,6 +398,12 @@ app.whenReady().then(() => {
   startWatcher();
   powerSaveBlocker.start('prevent-display-sleep');
   createWindows();
+  // Microphone: only the Control window may use it (Follow mode).
+  session.defaultSession.setPermissionRequestHandler((wc, perm, cb) => cb(perm === 'media' && !!controlWin && wc === controlWin.webContents));
+  session.defaultSession.setPermissionCheckHandler((wc, perm) => perm === 'media' && !!controlWin && wc === controlWin.webContents);
+  const prefs = () => profiles.control;
+  prefs.save = saveProfilesSoon;
+  follow = createFollowHost({ app, sendOut, sendCtl, controlWin: () => controlWin, outputWin: () => outputWin, prefs });
 
   // Debug helper: TP_SNAPSHOT=<dir> captures both windows to PNG and quits.
   if (process.env.TP_SNAPSHOT) {
@@ -396,12 +411,20 @@ app.whenReady().then(() => {
       const dir = process.env.TP_SNAPSHOT;
       if (process.env.TP_OUT_SIZE) { const [w, h] = process.env.TP_OUT_SIZE.split('x').map(Number); outputWin.setContentSize(w, h); }
       if (process.env.TP_CTL_SIZE) { const [w, h] = process.env.TP_CTL_SIZE.split('x').map(Number); controlWin.setContentSize(w, h); }
+      if (process.env.TP_FOLLOW_WAV) await outputWin.webContents.executeJavaScript('window.__followLog = []; 1');
       if (process.env.TP_ACTIONS) for (const a of JSON.parse(process.env.TP_ACTIONS)) { ipcMain.emit('action', {}, a); await new Promise(r => setTimeout(r, 400)); }
       if (process.env.TP_EVAL_CONTROL) {
         const out = await controlWin.webContents.executeJavaScript(process.env.TP_EVAL_CONTROL);
         fs.writeFileSync(path.join(dir, 'eval.txt'), String(out));
       }
       await new Promise(r => setTimeout(r, Number(process.env.TP_WAIT || 1500)));
+      if (process.env.TP_FOLLOW_WAV) {
+        const log = await outputWin.webContents.executeJavaScript('JSON.stringify(window.__followLog)');
+        const wavStart = await controlWin.webContents.executeJavaScript('window.__wavStart || 0');
+        const ctxClock = await controlWin.webContents.executeJavaScript('window.__ctxClock || []');
+        const firstSound = await controlWin.webContents.executeJavaScript('window.__firstSound || 0');
+        fs.writeFileSync(path.join(dir, 'follow-log.json'), JSON.stringify({ wav: process.env.TP_FOLLOW_WAV, wavStart, firstSound, ctxClock, log: JSON.parse(log), events: follow.events() }));
+      }
       if (process.env.TP_FRAMES) {
         // Cover the output window completely with the control window, focus control, then measure rAF cadence.
         controlWin.setBounds(outputWin.getBounds()); controlWin.focus();
@@ -430,5 +453,5 @@ app.whenReady().then(() => {
   }
 });
 
-app.on('before-quit', () => { quitting = true; saveProfilesNow(); });
+app.on('before-quit', () => { quitting = true; saveProfilesNow(); follow && follow.quit(); });
 app.on('window-all-closed', () => app.quit());

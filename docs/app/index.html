@@ -3,8 +3,6 @@
 <html lang="en" data-role="control">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" href="../img/favicon.png">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'">
 <title>GlidePrompter Web</title>
 <link rel="stylesheet" href="control.css">
@@ -28,6 +26,16 @@
     <button id="btnGuide" class="icon" title="Reading line [L]">
       <svg viewBox="0 0 40 40"><path d="M5 12l9 8-9 8zM35 12l-9 8 9 8z" fill="currentColor"/></svg>
     </button>
+  </div>
+
+  <div class="group follow" id="followBox" hidden>
+    <button id="btnFollow" class="icon" title="Follow mode: the script follows the speaker's voice [M]">
+      <svg viewBox="0 0 40 40"><rect x="14.5" y="4" width="11" height="19" rx="5.5" fill="none" stroke="currentColor" stroke-width="3"/><path d="M8.5 18.5a11.5 11.5 0 0 0 23 0M20 30v6M14 36h12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+    </button>
+    <div class="fcol">
+      <span id="followText">Follow</span>
+      <div id="followMeter" title="Microphone level"><i></i></div>
+    </div>
   </div>
 
   <label class="slider"><input type="range" id="fontSize" min="30" max="180" step="1"><span>Text size: <b id="fontSizeV"></b>px</span></label>
@@ -111,6 +119,21 @@
       </div>
       <label class="slider small"><input type="range" id="timerSize" min="16" max="160" step="1"><span>Timer size: <b id="timerSizeV"></b>px</span></label>
       <label class="check"><input type="checkbox" id="showTimer"> Show timer</label>
+    </div>
+    <div class="followside" hidden>
+      <div class="side-title" id="followTitle">Follow mode</div>
+      <div class="more" id="followPanel">
+        <p class="muted small">The script scrolls with the speaker's voice. Speech is recognised on this computer and never leaves it. Press <kbd>M</kbd> to start or stop.</p>
+        <label class="field">Microphone <select id="followMic"><option value="">Default</option></select></label>
+        <label class="check" title="Words the speaker has already said get a faint tint on the prompter"><input type="checkbox" id="followHighlight"> Tint the words already said</label>
+        <div id="packText" class="small"></div>
+        <div id="packBar" hidden><i></i></div>
+        <div class="row">
+          <button id="btnPack" class="pill wide" hidden>Download voice pack</button>
+          <button id="btnPackCancel" class="pill" hidden>Cancel</button>
+        </div>
+        <div id="followStats" class="muted small"></div>
+      </div>
     </div>
     <div class="side-title">More settings</div>
     <div class="more">
