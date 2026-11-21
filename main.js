@@ -1,6 +1,6 @@
 // GlidePrompter – main process.
 // Two windows: "GlidePrompter Output" (captured by OBS) and "GlidePrompter Control".
-const { app, BrowserWindow, ipcMain, dialog, screen, powerSaveBlocker, Menu, session } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, screen, powerSaveBlocker, Menu, session, systemPreferences } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -24,13 +24,15 @@ const CONFIG_FILE = () => path.join(app.getPath('userData'), 'config.json');
 
 // Where speaker scripts + profiles.json live.
 //  - Dev (npm start): <repo>/scripts (gitignored).
-//  - Packaged portable .exe: "GlidePrompter Scripts" next to the .exe.
+//  - Packaged portable .exe (Windows): "GlidePrompter Scripts" next to the .exe.
+//  - Packaged on Linux / macOS (AppImage, .deb, .app are read-only or system folders): Documents/GlidePrompter Scripts.
 // Both are seeded on first run with the sample script(s) in default-scripts/.
 function defaultScriptsDir() {
   const exeDir = app.isPackaged ? (process.env.PORTABLE_EXECUTABLE_DIR || path.dirname(process.execPath)) : null;
-  let dir = app.isPackaged ? path.join(exeDir, 'GlidePrompter Scripts') : path.join(__dirname, 'scripts');
+  const docs = path.join(app.getPath('documents'), 'GlidePrompter Scripts');
+  let dir = !app.isPackaged ? path.join(__dirname, 'scripts') : process.platform === 'win32' ? path.join(exeDir, 'GlidePrompter Scripts') : docs;
   try { fs.mkdirSync(dir, { recursive: true }); fs.accessSync(dir, fs.constants.W_OK); }
-  catch { dir = path.join(app.getPath('documents'), 'GlidePrompter Scripts'); fs.mkdirSync(dir, { recursive: true }); }
+  catch { dir = docs; fs.mkdirSync(dir, { recursive: true }); }
   const hasTxt = fs.readdirSync(dir).some(f => /\.txt$/i.test(f));
   if (!hasTxt) {
     const src = path.join(__dirname, 'default-scripts');
@@ -388,7 +390,9 @@ ipcMain.handle('info', () => ({ scriptsDir: config.scriptsDir }));
 // ---------------- lifecycle ----------------
 app.whenReady().then(() => {
   globalThis.TP_MAIN_ACTIONS = new Set(['speaker', 'speakerFile', 'fullscreen', 'onTop', 'display', 'size1080', 'showOutput', 'saveDefault', 'resetDefault', 'focusSearch', 'searchNav', ...FOLLOW_ACTIONS]);
-  Menu.setApplicationMenu(null);
+  // No menu bar on Windows / Linux. macOS needs an app menu for Cmd+Q and copy / paste in the editor.
+  Menu.setApplicationMenu(process.platform === 'darwin'
+    ? Menu.buildFromTemplate([{ role: 'appMenu' }, { role: 'editMenu' }, { role: 'windowMenu' }]) : null);
   const saved = readJson(CONFIG_FILE(), null);
   // Only a folder the user explicitly picked ("Change scripts folder…") is remembered.
   if (saved && saved.custom && saved.scriptsDir && fs.existsSync(saved.scriptsDir) && saved.packaged === app.isPackaged) config = saved;
@@ -399,7 +403,12 @@ app.whenReady().then(() => {
   powerSaveBlocker.start('prevent-display-sleep');
   createWindows();
   // Microphone: only the Control window may use it (Follow mode).
-  session.defaultSession.setPermissionRequestHandler((wc, perm, cb) => cb(perm === 'media' && !!controlWin && wc === controlWin.webContents));
+  session.defaultSession.setPermissionRequestHandler((wc, perm, cb) => {
+    const ok = perm === 'media' && !!controlWin && wc === controlWin.webContents;
+    // macOS also asks the user once, at system level (Privacy & Security > Microphone).
+    if (ok && process.platform === 'darwin') systemPreferences.askForMediaAccess('microphone').then(cb, () => cb(false));
+    else cb(ok);
+  });
   session.defaultSession.setPermissionCheckHandler((wc, perm) => perm === 'media' && !!controlWin && wc === controlWin.webContents);
   const prefs = () => profiles.control;
   prefs.save = saveProfilesSoon;

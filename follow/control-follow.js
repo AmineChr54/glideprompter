@@ -140,7 +140,7 @@
       text.textContent = 'Follow mode needs the English voice pack (speech model). It is downloaded once and works offline.';
       btn.hidden = false; btn.textContent = `Download voice pack (${mb(p.size)})`; btn.dataset.do = 'download';
     } else {
-      text.textContent = 'The voice pack is not available in this version yet.';
+      text.textContent = p.supported === false ? `Follow mode isn't available for this system (${p.platform}) yet.` : 'The voice pack is not available in this version yet.';
     }
     if (st.engineError) text.textContent += '  Engine error: ' + st.engineError;
     if (!st.listening) $('followStats').textContent = '';

@@ -4,6 +4,10 @@
   // Actions handled by the main process (everything else goes to the Output renderer).
   const MAIN_ACTIONS = new Set(['speaker', 'fullscreen', 'onTop', 'saveDefault', 'resetDefault', 'size1080', 'focusSearch', 'searchNav', 'followToggle']);
 
+  // On a Mac, Cmd works wherever Ctrl does (Ctrl keeps working too, e.g. in a browser that reserves Cmd+1…9).
+  const isMac = typeof navigator !== 'undefined' && /Mac/i.test(navigator.platform || navigator.userAgent || '');
+  const mod = (e) => e.ctrlKey || (isMac && e.metaKey);
+
   function keyToAction(e, phase) {
     const k = e.key;
     const lower = k.length === 1 ? k.toLowerCase() : k;
@@ -14,10 +18,10 @@
       return null;
     }
 
-    if (e.ctrlKey && !e.altKey && /^Digit[1-9]$/.test(e.code)) {
+    if (mod(e) && !e.altKey && /^Digit[1-9]$/.test(e.code)) {
       return repeat ? null : { a: 'speaker', index: Number(e.code.slice(5)) - 1 };
     }
-    if (e.ctrlKey && !e.altKey && !e.shiftKey && e.code === 'KeyF') return repeat ? null : { a: 'focusSearch' };
+    if (mod(e) && !e.altKey && !e.shiftKey && e.code === 'KeyF') return repeat ? null : { a: 'focusSearch' };
     if (e.ctrlKey || e.metaKey || e.altKey) return null;
     if (k === 'Enter' || k === 'F3') return { a: 'searchNav', d: e.shiftKey ? -1 : 1 };
 
@@ -81,5 +85,5 @@
     ['?', 'Show / hide this help'],
   ];
 
-  window.TPKeys = { keyToAction, MAIN_ACTIONS, HELP };
+  window.TPKeys = { keyToAction, MAIN_ACTIONS, HELP, isMac, mod };
 })();
