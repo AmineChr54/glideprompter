@@ -61,7 +61,7 @@
     ['PageUp / PageDown', 'Previous / next paragraph'],
     ['Home / End', 'Jump to start / end'],
     ['T', 'Timer start / stop'],
-    ['Shift + T', 'Timer reset to 00:00'],
+    ['Shift + T', 'Timer reset'],
     ['+ / −', 'Text size ±4 px'],
     [', / .   ( [ / ] )', 'Margin −1 / +1 %'],
     ['L', 'Reading line on / off'],
@@ -73,6 +73,8 @@
     ['Enter / Shift + Enter', 'Jump prompter to next / previous match (also F3)'],
     ['Ctrl + 1…9', 'Switch speaker'],
     ['Ctrl + S', 'Save script (in editor)'],
+    ['Ctrl + B / I / U', 'Bold / italic / underline (in editor)'],
+    ['Ctrl + Shift + H', 'Highlight (in editor)'],
     ['Esc', 'Pause / leave text field'],
     ['?', 'Show / hide this help'],
   ];

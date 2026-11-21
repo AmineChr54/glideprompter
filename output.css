@@ -2,6 +2,8 @@
   --bg: #000; --fg: #fff;
   --font-size: 72px; --line-height: 1.8; --align: left; --margin: 12%;
   --read-y: 35vh; --timer-size: 48px;
+  --font-family: Arial, Helvetica, sans-serif; --font-weight: 400; --letter-spacing: 0em;
+  --timer-fg: #fff; --timer-bg: rgba(0, 0, 0, 0.75);
 }
 html, body {
   margin: 0; height: 100%; overflow: hidden;
@@ -17,7 +19,9 @@ html, body {
 #content {
   position: absolute; left: 0; right: 0; top: 0;
   padding: 0 var(--margin);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight);
+  letter-spacing: var(--letter-spacing);
   text-align: var(--align);
   font-size: var(--font-size);
   line-height: var(--line-height);
@@ -26,6 +30,11 @@ html, body {
   contain: layout style;
 }
 #content p { margin: 0; overflow-wrap: break-word; }
+#content b { font-weight: bolder; }
+#content mark { background: rgba(255, 214, 10, 0.35); color: inherit; border-radius: 0.12em; padding: 0 0.08em; }
+.fc-red { color: #ff4d4d; } .fc-orange { color: #ff9f43; } .fc-yellow { color: #ffd60a; }
+.fc-green { color: #4cd964; } .fc-blue { color: #5aa9ff; } .fc-purple { color: #c084fc; }
+.fc-white { color: #ffffff; } .fc-gray { color: #8e8e93; }
 
 /* Stage cues: smaller, coloured, never mistaken for script text */
 .cue {
@@ -59,17 +68,23 @@ html, body {
   background: rgba(255, 255, 255, 0.045);
 }
 
-/* Count-up timer, top right */
+/* Timer: corner via data-pos, colours via variables, warn / over states */
 #timer {
   position: absolute; top: 0.25em; right: 0.45em;
   font-family: "Bahnschrift SemiBold Condensed", "Bahnschrift Condensed", "Bahnschrift", "Arial Narrow", sans-serif;
   font-stretch: condensed; font-weight: 700;
   font-variant-numeric: tabular-nums;
   font-size: var(--timer-size); line-height: 1;
-  color: #fff; background: rgba(0, 0, 0, 0.75);
+  color: var(--timer-fg); background: var(--timer-bg);
   padding: 0.08em 0.25em; border-radius: 0.12em;
   letter-spacing: 0.02em; pointer-events: none;
+  transition: color 0.3s, background-color 0.3s;
 }
+#timer[data-pos="tl"] { right: auto; left: 0.45em; }
+#timer[data-pos="bl"] { top: auto; bottom: 0.35em; right: auto; left: 0.45em; }
+#timer[data-pos="br"] { top: auto; bottom: 0.35em; }
+#timer.warn { color: #111; background: #ffcc00; }
+#timer.over { color: #fff; background: #e0241b; }
 #timer.hidden { display: none; }
 
 #progress {

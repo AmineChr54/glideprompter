@@ -27,10 +27,30 @@
     return 'cue cue-action';
   }
 
+  // Inline formatting markup (applied to already-escaped text):
+  //   **bold**  *italic*  __underline__  ==highlight==  {red}coloured{/}  {#ff8800}any hex{/}
+  const COLORS = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'white', 'gray'];
+  function formatHtml(h) {
+    return h
+      .replace(/\{(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?|[a-z]+)\}(.*?)\{\/\}/g, (m, c, t) =>
+        c[0] === '#' ? `<span class="fc" style="color:${c}">${t}</span>`
+          : COLORS.includes(c) ? `<span class="fc fc-${c}">${t}</span>` : m)
+      .replace(/\*\*(?=\S)(.+?)\*\*/g, '<b>$1</b>')
+      .replace(/__(?=\S)(.+?)__/g, '<u>$1</u>')
+      .replace(/==(?=\S)(.+?)==/g, '<mark>$1</mark>')
+      .replace(/\*(?=[^\s*])([^*]*?[^\s*])\*/g, '<i>$1</i>');
+  }
+
   function lineToHtml(line) {
     if (line.trim() === '') return '&nbsp;';
-    return esc(line).replace(/\[([^\]]+)\]/g, (_, inner) =>
+    return formatHtml(esc(line)).replace(/\[([^\]]+)\]/g, (_, inner) =>
       '<span class="' + cueClass(inner) + '">' + inner.trim() + '</span>');
+  }
+
+  // Plain words of a line (markup and cues removed), for word counts.
+  function plainWords(line) {
+    return String(line).replace(/\[[^\]]*\]/g, ' ').replace(/\{[^}]*\}/g, ' ')
+      .replace(/\*\*|__|==|\*/g, '').split(/\s+/).filter(w => /[\p{L}\p{N}]/u.test(w)).length;
   }
 
   // ---------- word search (case-, accent- and punctuation-insensitive) ----------
@@ -76,5 +96,5 @@
     return ranges;
   }
 
-  window.TPParse = { toLines, toFileText, lineToHtml, findAll, normQuery };
+  window.TPParse = { toLines, toFileText, lineToHtml, findAll, normQuery, plainWords, COLORS };
 })();

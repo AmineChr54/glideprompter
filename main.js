@@ -10,11 +10,7 @@ app.commandLine.appendSwitch('disable-background-timer-throttling');
 app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
 app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion');
 
-const DEFAULTS = {
-  fontSize: 72, margin: 12, speed: 24, bg: '#000000', fg: '#ffffff',
-  lineHeight: 1.8, align: 'left', mirrorH: false, mirrorV: false, readingLine: 0.35,
-  showGuide: true, showProgress: true, timerSize: 48, showTimer: true,
-};
+const DEFAULTS = require('./shared/defaults.js');   // also used by the web version
 const SETTING_KEYS = Object.keys(DEFAULTS);
 
 const CONFIG_FILE = () => path.join(app.getPath('userData'), 'config.json');
@@ -107,7 +103,9 @@ function readScript(file) {
 function speakerList() {
   return speakers.map(s => {
     const p = profiles.speakers[s.file] || {};
-    return { ...s, progress: p.progress || 0, timerMs: p.timerMs || 0 };
+    const st = settingsFor(s.file);
+    return { ...s, progress: p.progress || 0, timerMs: p.timerMs || 0,
+      timer: { timerMode: st.timerMode, timerTarget: st.timerTarget, timerWarn: st.timerWarn, timerOvertime: st.timerOvertime } };
   });
 }
 
@@ -159,6 +157,7 @@ function startWatcher() {
 function sendOut(ch, data) { if (outputWin && !outputWin.isDestroyed()) outputWin.webContents.send(ch, data); }
 function sendCtl(ch, data) { if (controlWin && !controlWin.isDestroyed()) controlWin.webContents.send(ch, data); }
 
+const ICON = path.join(__dirname, 'build', 'icon.png');
 const WEB_PREFS = {
   preload: path.join(__dirname, 'preload.js'),
   contextIsolation: true,
@@ -182,7 +181,7 @@ function createWindows() {
     : { x: wa.x + wa.width - outDef.width - 10, y: wa.y + 10, ...outDef };
 
   outputWin = new BrowserWindow({
-    ...ob, title: 'GlidePrompter Output', backgroundColor: '#000000',
+    ...ob, title: 'GlidePrompter Output', backgroundColor: '#000000', icon: ICON,
     minimizable: false, autoHideMenuBar: true, show: false,
     alwaysOnTop: !!profiles.output.onTop,
     webPreferences: WEB_PREFS,
@@ -195,7 +194,7 @@ function createWindows() {
   const cb = boundsVisible(profiles.control.bounds) ? profiles.control.bounds
     : { x: wa.x + 10, y: wa.y + Math.round(wa.height * 0.3), width: Math.min(1400, Math.round(wa.width * 0.7)), height: Math.round(wa.height * 0.65) };
   controlWin = new BrowserWindow({
-    ...cb, minWidth: 900, minHeight: 500, title: 'GlidePrompter Control', backgroundColor: '#111111',
+    ...cb, minWidth: 900, minHeight: 500, title: 'GlidePrompter Control', backgroundColor: '#111111', icon: ICON,
     autoHideMenuBar: true, show: false, webPreferences: WEB_PREFS,
   });
   controlWin.setMenuBarVisibility(false);
@@ -395,6 +394,8 @@ app.whenReady().then(() => {
   if (process.env.TP_SNAPSHOT) {
     setTimeout(async () => {
       const dir = process.env.TP_SNAPSHOT;
+      if (process.env.TP_OUT_SIZE) { const [w, h] = process.env.TP_OUT_SIZE.split('x').map(Number); outputWin.setContentSize(w, h); }
+      if (process.env.TP_CTL_SIZE) { const [w, h] = process.env.TP_CTL_SIZE.split('x').map(Number); controlWin.setContentSize(w, h); }
       if (process.env.TP_ACTIONS) for (const a of JSON.parse(process.env.TP_ACTIONS)) { ipcMain.emit('action', {}, a); await new Promise(r => setTimeout(r, 400)); }
       if (process.env.TP_EVAL_CONTROL) {
         const out = await controlWin.webContents.executeJavaScript(process.env.TP_EVAL_CONTROL);
@@ -410,6 +411,17 @@ app.whenReady().then(() => {
             const slow = d.filter(x => x > 12).length; res({ slow, frames: d.length, median: d[d.length>>1].toFixed(2), p99: d[Math.floor(d.length*0.99)].toFixed(2), max: d[d.length-1].toFixed(2) }); } }
           requestAnimationFrame(f); })`);
         fs.writeFileSync(path.join(dir, 'frames.json'), JSON.stringify(stats));
+      }
+      if (process.env.TP_RECORD) {
+        // TP_RECORD=<frames>x<ms>: capture the output window repeatedly (for the README / website clip).
+        const [n, ms] = process.env.TP_RECORD.split('x').map(Number);
+        fs.mkdirSync(path.join(dir, 'frames'), { recursive: true });
+        for (let i = 0; i < n; i++) {
+          const t0 = Date.now();
+          const img = await outputWin.webContents.capturePage();
+          fs.writeFileSync(path.join(dir, 'frames', String(i).padStart(4, '0') + '.png'), img.toPNG());
+          await new Promise(r => setTimeout(r, Math.max(0, ms - (Date.now() - t0))));
+        }
       }
       fs.writeFileSync(path.join(dir, 'output.png'), (await outputWin.webContents.capturePage()).toPNG());
       fs.writeFileSync(path.join(dir, 'control.png'), (await controlWin.webContents.capturePage()).toPNG());

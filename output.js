@@ -8,7 +8,8 @@
 
   // ---- CuePrompter speed model: 1 px every (40 - speed) ms (browser timers clamp at 4 ms) ----
   const pxPerSec = (speed) => (speed <= 0 ? 0 : 1000 / Math.max(4, 40 - speed));
-  const LIMITS = { fontSize: [30, 180], margin: [0, 40], speed: [1, 50], timerSize: [16, 160], readingLine: [0.05, 0.9], lineHeight: [1, 3] };
+  const LIMITS = { fontSize: [30, 180], margin: [0, 40], speed: [1, 50], timerSize: [16, 160], readingLine: [0.05, 0.9], lineHeight: [1, 3],
+    letterSpacing: [-0.05, 0.3], timerTarget: [0, 86399], timerWarn: [0, 3600] };
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
   // Motion tuning
@@ -29,7 +30,7 @@
   const held = new Map();       // dir -> pressedAt
 
   // timer
-  let timerRunning = false, timerAccum = 0, timerStart = 0, timerShown = '';
+  let timerRunning = false, timerAccum = 0, timerStart = 0, timerShown = '', timerState = '';
 
   // ---------------- layout ----------------
   function applyVisual() {
@@ -40,6 +41,13 @@
     root.style.setProperty('--margin', S.margin + '%');
     root.style.setProperty('--align', S.align || 'left');
     root.style.setProperty('--timer-size', S.timerSize + 'px');
+    root.style.setProperty('--font-family', `"${S.fontFamily || 'Arial'}", Arial, sans-serif`);
+    root.style.setProperty('--font-weight', S.fontWeight || 400);
+    root.style.setProperty('--letter-spacing', (S.letterSpacing || 0) + 'em');
+    root.style.setProperty('--timer-fg', S.timerFg || '#ffffff');
+    root.style.setProperty('--timer-bg', (S.timerBg || '#000000') + 'bf');
+    timerEl.dataset.pos = S.timerPos || 'tr';
+    timerShown = '';
     root.style.setProperty('--read-y', (S.readingLine * 100) + 'vh');
     stage.classList.toggle('mirror-h', !!S.mirrorH);
     stage.classList.toggle('mirror-v', !!S.mirrorV);
@@ -111,7 +119,7 @@
 
   // ---------------- settings ----------------
   function emitSettings() { tp.settings({ file, settings: S }); }
-  const LAYOUT_KEYS = new Set(['fontSize', 'lineHeight', 'margin', 'readingLine', 'align']);
+  const LAYOUT_KEYS = new Set(['fontSize', 'lineHeight', 'margin', 'readingLine', 'align', 'fontFamily', 'fontWeight', 'letterSpacing']);
   function set(key, value) {
     if (LIMITS[key]) value = clamp(Number(value), LIMITS[key][0], LIMITS[key][1]);
     if (S[key] === value) return;
@@ -134,6 +142,7 @@
         held.set(a.dir, now);
         break;
       case 'nudgeRelease': held.delete(a.dir); break;
+      case 'scrollBy': T += Number(a.px) || 0; break;
       case 'releaseAll': held.clear(); break;
       case 'speedBy': set('speed', S.speed + a.d); break;
       case 'para': jumpPara(a.d); break;
@@ -147,6 +156,8 @@
       case 'toggleAlign': set('align', S.align === 'center' ? 'left' : 'center'); break;
       case 'timerToggle': toggleTimer(); break;
       case 'timerReset': timerAccum = 0; timerStart = now; timerShown = ''; break;
+      case 'timerSet': setTimerMs(a.ms); break;
+      case 'timerAdd': setTimerMs(timerMs() + a.ms); break;
       case 'applySettings': S = { ...a.settings }; relayout(true); emitSettings(); break;
     }
     forceReport = true;
@@ -176,10 +187,8 @@
     else { timerStart = now; timerRunning = true; }
   }
   const timerMs = () => timerAccum + (timerRunning ? performance.now() - timerStart : 0);
-  function fmt(ms) {
-    const t = Math.floor(ms / 1000), h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), sec = t % 60;
-    const p2 = (n) => String(n).padStart(2, '0');
-    return h ? `${h}:${p2(m)}:${p2(sec)}` : `${p2(m)}:${p2(sec)}`;
+  function setTimerMs(ms) {
+    timerAccum = Math.max(0, Number(ms) || 0); timerStart = performance.now(); timerShown = '';
   }
 
   // ---------------- frame loop ----------------
@@ -231,8 +240,9 @@
       if (Math.abs(prog - lastProg) > 0.0005) { fillEl.style.transform = `scaleX(${prog.toFixed(4)})`; lastProg = prog; }
     }
 
-    const tStr = fmt(timerMs());
-    if (tStr !== timerShown) { timerEl.textContent = tStr; timerShown = tStr; }
+    const tv = TPTimer.view(timerMs(), S);
+    if (tv.text !== timerShown) { timerEl.textContent = tv.text; timerShown = tv.text; }
+    if (tv.state !== timerState) { timerEl.classList.toggle('warn', tv.state === 'warn'); timerEl.classList.toggle('over', tv.state === 'over'); timerState = tv.state; }
 
     if (file && (forceReport || now - lastReport > 100)) report(now, y);
     requestAnimationFrame(frame);
@@ -244,9 +254,10 @@
     const r = {
       file, pos, para: pos.para, paraCount: tops.length,
       progress: maxY ? y / maxY : 0,
-      timerMs: Math.floor(timerMs()), timerRunning, playing, speed: S.speed,
+      timerMs: Math.floor(timerMs()), timerRunning, playing, speed: S.speed, scrollPx: maxY,
+      y, vw: window.innerWidth, vh: window.innerHeight,
     };
-    const key = [pos.para, pos.within.toFixed(3), Math.floor(r.timerMs / 1000), timerRunning, playing, S.speed].join('|');
+    const key = [pos.para, pos.within.toFixed(3), Math.floor(r.timerMs / 1000), timerRunning, playing, S.speed, Math.round(maxY), Math.round(y), r.vw, r.vh].join('|');
     if (key === lastReportKey && !forceReport) return;
     lastReportKey = key; forceReport = false;
     tp.report(r);
@@ -273,7 +284,8 @@
   tp.on('load', load);
   tp.on('action', act);
 
-  S = { fontSize: 72, lineHeight: 1.8, margin: 12, readingLine: 0.35, timerSize: 48, bg: '#000000', fg: '#ffffff', speed: 24, align: 'left', showGuide: true, showProgress: true };
+  S = { fontSize: 72, lineHeight: 1.8, margin: 12, readingLine: 0.35, timerSize: 48, bg: '#000000', fg: '#ffffff', speed: 24, align: 'left', showGuide: true, showProgress: true,
+        fontFamily: 'Arial', fontWeight: 400, letterSpacing: 0, timerMode: 'up', timerTarget: 600, timerWarn: 60, timerOvertime: true, timerPos: 'tr', timerFg: '#ffffff', timerBg: '#000000' };
   applyVisual(); measure();
   requestAnimationFrame(frame);
   tp.ready('output');
