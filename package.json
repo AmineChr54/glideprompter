@@ -1,6 +1,6 @@
 {
   "name": "glideprompter",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Smooth two-window teleprompter for live talks and OBS",
   "main": "main.js",
   "author": "Amine Cheikhrouhou",
@@ -11,6 +11,8 @@
     "start": "electron .",
     "test": "node --test",
     "dist": "electron-builder --win portable",
+    "dist:linux": "electron-builder --linux AppImage deb --x64",
+    "dist:mac": "electron-builder --mac zip --arm64 --x64",
     "web": "node tools/build-web.js"
   },
   "devDependencies": {
@@ -58,6 +60,36 @@
     },
     "portable": {
       "artifactName": "GlidePrompter.exe"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "build/icon.png",
+      "category": "AudioVideo",
+      "synopsis": "Smooth two-window teleprompter",
+      "maintainer": "AmineChr54 <AmineChr54@users.noreply.github.com>",
+      "executableName": "glideprompter"
+    },
+    "appImage": {
+      "artifactName": "GlidePrompter-linux-x86_64.AppImage"
+    },
+    "deb": {
+      "artifactName": "GlidePrompter-linux-amd64.deb"
+    },
+    "mac": {
+      "target": [
+        "zip"
+      ],
+      "icon": "build/icon.png",
+      "category": "public.app-category.productivity",
+      "identity": null,
+      "hardenedRuntime": false,
+      "artifactName": "GlidePrompter-mac-${arch}.zip",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Follow mode listens to the speaker so the script can scroll with their voice. Audio stays on this Mac."
+      }
     }
   }
 }

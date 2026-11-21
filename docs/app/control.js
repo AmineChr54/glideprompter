@@ -404,6 +404,14 @@
 
   // ---------------- help ----------------
   $('helpTable').innerHTML = TPKeys.HELP.filter(([k]) => k !== 'M' || tp.follow).map(([k, d]) => `<tr><td><kbd>${k}</kbd></td><td>${d}</td></tr>`).join('');
+  // On a Mac, show ⌘ instead of Ctrl in labels, tooltips and the help (both keys work).
+  if (TPKeys.isMac) {
+    const mac = (t) => t.replace(/Ctrl\s*\+\s*/g, '⌘').replace(/Ctrl/g, '⌘');
+    const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let n; (n = tw.nextNode());) if (n.nodeValue.includes('Ctrl')) n.nodeValue = mac(n.nodeValue);
+    for (const el of document.querySelectorAll('[title*="Ctrl"], [placeholder*="Ctrl"]'))
+      for (const at of ['title', 'placeholder']) if (el.hasAttribute(at)) el.setAttribute(at, mac(el.getAttribute(at)));
+  }
   const toggleHelp = (show) => { $('help').hidden = show === undefined ? !$('help').hidden : !show; };
   $('btnHelp').onclick = () => toggleHelp();
   $('btnHelpClose').onclick = () => toggleHelp(false);
@@ -413,9 +421,9 @@
   const isTextField = (el) => el && (el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' ||
     (el.tagName === 'INPUT' && !['range', 'checkbox', 'color', 'button'].includes(el.type)));
   window.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && (e.key === 's' || e.key === 'S')) { e.preventDefault(); if (current) save(); return; }
-    if (e.ctrlKey && !e.shiftKey && e.code === 'KeyF') { e.preventDefault(); focusSearch(); return; }
-    if (document.activeElement === $('editor') && e.ctrlKey && !e.altKey) {
+    if (TPKeys.mod(e) && (e.key === 's' || e.key === 'S')) { e.preventDefault(); if (current) save(); return; }
+    if (TPKeys.mod(e) && !e.shiftKey && e.code === 'KeyF') { e.preventDefault(); focusSearch(); return; }
+    if (document.activeElement === $('editor') && TPKeys.mod(e) && !e.altKey) {
       const w = !e.shiftKey && { KeyB: '**', KeyI: '*', KeyU: '__' }[e.code] || (e.shiftKey && e.code === 'KeyH' && '==');
       if (w) { e.preventDefault(); wrapSel(w); return; }
     }

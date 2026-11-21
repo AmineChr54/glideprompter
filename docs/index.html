@@ -354,9 +354,10 @@ footer a:hover { color: var(--fg); }
       <a class="btn btn-outline btn-lg" data-cta="web" href="app/" target="_blank" rel="noopener"><svg><use href="#i-globe"/></svg>Run it in your browser</a>
     </div>
     <p class="os-note" id="osNote" hidden></p>
+    <p class="os-note" id="osAlso">Also for <a href="https://github.com/AmineChr54/glideprompter#linux">Linux</a> and <a href="https://github.com/AmineChr54/glideprompter#macos-experimental">macOS (experimental)</a>.</p>
     <div class="meta">
       <span><svg><use href="#i-check"/></svg>Free &amp; open source</span>
-      <span><svg><use href="#i-check"/></svg>Single portable .exe, no install</span>
+      <span><svg><use href="#i-check"/></svg>Windows, Linux &amp; macOS (experimental)</span>
       <span><svg><use href="#i-check"/></svg>Works offline</span>
     </div>
 
@@ -456,7 +457,7 @@ footer a:hover { color: var(--fg); }
             <li><svg><use href="#i-check"/></svg><span><b>Words already said get a faint tint,</b> so you always see where you are.</span></li>
             <li><svg><use href="#i-check"/></svg><span><b>Take over any time</b> with the arrow keys, search or the wheel. The timer starts on your first word.</span></li>
           </ul>
-          <p style="margin-top:10px;font-size:13px">Windows app, English. One-time voice pack download (about 150 MB) from inside the app.</p>
+          <p style="margin-top:10px;font-size:13px">Desktop app (Windows, Linux, macOS experimental), English. One-time voice pack download (about 150 MB) from inside the app.</p>
         </div>
         <div class="demo">
           <div id="tpFollow" class="tp" role="img" aria-label="Demo: the prompter follows a speaker's voice and tints the words already said" style="--tp-size:4.6cqw"></div>
@@ -734,7 +735,7 @@ footer a:hover { color: var(--fg); }
       <div class="key" data-k="HV">Mirror horizontal / vertical<kbd>H V</kbd></div>
       <div class="key" data-k="LP">Reading line / progress bar<kbd>L P</kbd></div>
       <div class="key" data-k="A">Align left / centre<kbd>A</kbd></div>
-      <div class="key" data-k="M">Follow mode on / off (Windows app)<kbd>M</kbd></div>
+      <div class="key" data-k="M">Follow mode on / off (desktop app)<kbd>M</kbd></div>
       <div class="key" data-k="F">Fullscreen output<kbd>F</kbd></div>
       <div class="key" data-k="CB">Bold / italic / underline (editor)<kbd>Ctrl B I U</kbd></div>
     </div>
@@ -749,9 +750,9 @@ footer a:hover { color: var(--fg); }
       <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Why does Windows warn me when I start the .exe?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>The app isn't code-signed, because signing certificates are expensive. Click <b>More info → Run anyway</b>. You can also read the source on GitHub and build the .exe yourself with <code>npm run dist</code>.</p></div></div></div>
       <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>What does a script file look like?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>It's a plain <code>.txt</code> file where every line is one paragraph. Name it like <code>3_Jane_Doe.txt</code>. The number sets the order and the <kbd>Ctrl</kbd> <kbd>3</kbd> shortcut. Cues go in [BRACKETS] and formatting uses the markup shown above. Files that end each line with <code>&lt;br&gt;</code> (CuePrompter's paste format) also work.</p></div></div></div>
       <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>The web version stops scrolling when I cover the prompter window. Why?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>Browsers pause windows that are minimised or fully covered, to save power. Put the prompter window on a second screen or next to the control window. GlidePrompter shows a warning when this happens. The Windows app turns this pausing off, so it stays smooth even when OBS captures a hidden window.</p></div></div></div>
-      <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Does Follow mode send my voice anywhere?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>No. Speech recognition runs on your own computer, and audio never leaves it. The first time, the app downloads an English voice pack (about 150 MB, checked before use, removable any time). After that it works offline. It uses <a href="https://github.com/k2-fsa/sherpa-onnx">sherpa-onnx</a> with NVIDIA's CC-BY-4.0 streaming FastConformer model. Follow mode is in the Windows app only, not the web version. A lavalier or a feed from the sound desk works better than the laptop's own microphone.</p></div></div></div>
+      <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Does Follow mode send my voice anywhere?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>No. Speech recognition runs on your own computer, and audio never leaves it. The first time, the app downloads an English voice pack (about 150 MB, checked before use, removable any time). After that it works offline. It uses <a href="https://github.com/k2-fsa/sherpa-onnx">sherpa-onnx</a> with NVIDIA's CC-BY-4.0 streaming FastConformer model. Follow mode is in the desktop app (Windows, Linux and, experimentally, macOS), not the web version. A lavalier or a feed from the sound desk works better than the laptop's own microphone.</p></div></div></div>
       <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Can I use it with a beam-splitter / glass teleprompter?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>Yes. Press <kbd>H</kbd> to mirror horizontally (and <kbd>V</kbd> for vertically). Each speaker remembers this setting.</p></div></div></div>
-      <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Is there a macOS or Linux version?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>Not as a desktop download yet. They're planned in <a href="https://github.com/AmineChr54/glideprompter/issues/1">#1 (macOS)</a> and <a href="https://github.com/AmineChr54/glideprompter/issues/2">#2 (Linux)</a>. Until then, the web app runs in any modern browser on any system, and <code>npm start</code> from the source code works on macOS and Linux too.</p></div></div></div>
+      <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Is there a macOS or Linux version?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>Yes. <b>Linux</b> (x64): an <a href="https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter-linux-x86_64.AppImage">AppImage</a> that runs without installing, or a <a href="https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter-linux-amd64.deb">.deb</a> for Debian and Ubuntu. <b>macOS</b> is <i>experimental</i>: builds for <a href="https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter-mac-arm64.zip">Apple silicon</a> and <a href="https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter-mac-x64.zip">Intel</a> exist, but they are untested and not signed by Apple, so macOS needs <a href="https://github.com/AmineChr54/glideprompter#macos-experimental">two Terminal commands</a> before the first start. Feedback is welcome in <a href="https://github.com/AmineChr54/glideprompter/issues/1">#1</a>. The web app runs on any system too.</p></div></div></div>
     </div>
   </div>
 </section>
@@ -789,18 +790,31 @@ const svgUse = id => `<svg><use href="#${id}"/></svg>`;
   const mobile = /android|iphone|ipad|ipod|mobile/i.test(ua) || (/mac/i.test(plat) && navigator.maxTouchPoints > 1);
   const mac = !mobile && /mac/i.test(plat), linux = !mobile && /linux/i.test(plat) && !/android/i.test(ua);
   if (!mac && !linux && !mobile) return;
-  const os = mac ? 'macOS' : linux ? 'Linux' : 'your phone or tablet';
+  $('#osAlso').hidden = true;
+  const REL = 'https://github.com/AmineChr54/glideprompter/releases/latest/download/';
+  const navBtn = $('[data-os-primary]'), note = $('#osNote');
   for (const id of ['heroCta', 'finalCta']) {
     const box = $('#' + id), win = $('[data-cta=win]', box), web = $('[data-cta=web]', box);
-    win.className = 'btn btn-outline btn-lg'; web.className = 'btn btn-primary btn-lg';
-    box.insertBefore(web, win);
+    if (linux) {
+      win.href = REL + 'GlidePrompter-linux-x86_64.AppImage';
+      win.innerHTML = '<svg><use href="#i-down"/></svg>Download for Linux' + (id === 'finalCta' ? ' <small style="opacity:.75;font-weight:400">AppImage, x64</small>' : '');
+    } else if (mac) {
+      win.href = REL + 'GlidePrompter-mac-arm64.zip';
+      win.innerHTML = '<svg><use href="#i-down"/></svg>Download for Mac <small style="opacity:.75;font-weight:400">experimental</small>';
+      win.className = 'btn btn-outline btn-lg'; web.className = 'btn btn-primary btn-lg';
+      box.insertBefore(web, win);
+    } else {
+      win.className = 'btn btn-outline btn-lg'; web.className = 'btn btn-primary btn-lg';
+      box.insertBefore(web, win);
+    }
   }
-  const navBtn = $('[data-os-primary]');
-  navBtn.href = 'app/'; navBtn.target = '_blank'; navBtn.rel = 'noopener'; navBtn.textContent = 'Open web app';
-  const note = $('#osNote');
+  if (linux) navBtn.href = REL + 'GlidePrompter-linux-x86_64.AppImage';
+  else { navBtn.href = 'app/'; navBtn.target = '_blank'; navBtn.rel = 'noopener'; navBtn.textContent = 'Open web app'; }
   note.innerHTML = mobile
     ? 'GlidePrompter works best on a laptop with a second screen, but you can try the web app right here.'
-    : `On ${os}? The desktop app is on the way (<a href="https://github.com/AmineChr54/glideprompter/issues/${mac ? 1 : 2}">#${mac ? 1 : 2}</a>). The web app works on ${os} today.`;
+    : linux
+      ? `Also as a <a href="${REL}GlidePrompter-linux-amd64.deb">.deb for Debian / Ubuntu</a>. <a href="https://github.com/AmineChr54/glideprompter#linux">Linux setup</a>`
+      : `The Mac app is experimental and not signed by Apple: <a href="https://github.com/AmineChr54/glideprompter#macos-experimental">read the two setup steps</a> first. Intel Mac? <a href="${REL}GlidePrompter-mac-x64.zip">Get the Intel build</a>. The web app works on macOS today.`;
   note.hidden = false;
 })();
 

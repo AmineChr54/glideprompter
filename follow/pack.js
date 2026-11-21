@@ -6,23 +6,22 @@ const path = require('path');
 const crypto = require('crypto');
 const https = require('https');
 
+// One model for every system, plus a speech runtime per platform. Windows keeps the original
+// `runtime/` folder, so packs installed by v1.2.0 stay valid. The file lists come from
+// tools/follow/build-pack.js (pack-manifest.json); the revision is the Hugging Face commit of that upload.
+const MANIFEST = require('./pack-manifest.json');
+const PLATFORM = `${process.platform}-${process.arch}`;
+const RUNTIME = MANIFEST.runtimes[PLATFORM] || null;
+
 const PACK = {
   id: 'en-1',
   label: 'English voice pack',
   repo: 'aminechr54/glideprompter-voice-en',
-  revision: '765a994ac4bcf999d0ede5141c856e78717990b8',
+  revision: '997146bf13fce87997a29d120080e4b03ce742b6',
   model: { kind: 'nemoCtc', model: 'model/model.int8.onnx', tokens: 'model/tokens.txt', vad: 'model/silero_vad.onnx' },
-  // From tools/follow/build-pack.js (.dev/pack/en-1/manifest.json)
-  files: [
-    { path: 'runtime/sherpa-onnx.node', size: 748544, sha256: '863e730ddf19107ec588f742cc5d5af7f24ee5515b9d4f734e77e669bfc20dae' },
-    { path: 'runtime/sherpa-onnx-c-api.dll', size: 4775424, sha256: 'ae8f86144101373a72cbe6b6c6cbd8b91bb95e315797d1c7e829c57ba76fd190' },
-    { path: 'runtime/sherpa-onnx-cxx-api.dll', size: 271360, sha256: '81dfd8bd88efb80cc65e728923534cbad9773bc4fd2e282370c5a6b1aca1e256' },
-    { path: 'runtime/onnxruntime.dll', size: 17799168, sha256: '7f66f939a881baf4f46a2216496798edf4a1429878b646d12674aa62f27d8a25' },
-    { path: 'runtime/onnxruntime_providers_shared.dll', size: 104960, sha256: '551d0e1fe4c227d8542314ba718d52f4379e0c7bfe729a37c59833a884e27b4d' },
-    { path: 'model/model.int8.onnx', size: 132048466, sha256: '2225124a139df2e6485ec7ec70faabd906923776d6564c0b264113315b9d1816' },
-    { path: 'model/tokens.txt', size: 11896, sha256: '618dc110fc2213886b52e063ff42329bbdf37a266ca7705184090fa5f39f3131' },
-    { path: 'model/silero_vad.onnx', size: 643854, sha256: '9e2449e1087496d8d4caba907f23e0bd3f78d91fa552479bb9c23ac09cbb1fd6' },
-  ],
+  platform: PLATFORM,
+  runtime: RUNTIME,                                     // { dir, npm, files } or null on an unsupported system
+  files: RUNTIME ? [...RUNTIME.files, ...MANIFEST.model] : [],
 };
 
 const sum = (a) => a.reduce((s, f) => s + f.size, 0);
@@ -32,7 +31,8 @@ function create(app) {
   // Developer setup: `npm start` from a checkout with the runtime in node_modules and the model in .dev/models.
   const dev = !app.isPackaged && !process.env.TP_FOLLOW_NO_DEV && (() => {      // TP_FOLLOW_NO_DEV=1 tests the real download
     const root = path.join(__dirname, '..');
-    const runtime = path.join(root, 'node_modules', 'sherpa-onnx-win-x64');
+    if (!RUNTIME) return null;
+    const runtime = path.join(root, 'node_modules', RUNTIME.npm);
     const md = path.join(root, '.dev', 'models');
     const mdir = path.join(md, 'glideprompter-fastconformer-ctc-en-80ms');   // tools/follow/export-multi.py
     if (!fs.existsSync(path.join(runtime, 'sherpa-onnx.node')) || !fs.existsSync(path.join(mdir, 'model.int8.onnx'))) return null;
@@ -47,12 +47,13 @@ function create(app) {
     if (dev && !installed()) return dev;
     if (!installed()) return null;
     const m = PACK.model, p = (x) => path.join(dir, x);
-    return { runtime: p('runtime'), model: { kind: m.kind, model: p(m.model), tokens: p(m.tokens) }, vad: p(m.vad) };
+    return { runtime: p(RUNTIME.dir), model: { kind: m.kind, model: p(m.model), tokens: p(m.tokens) }, vad: p(m.vad) };
   }
 
   function status() {
     return { id: PACK.id, label: PACK.label, size: sum(PACK.files), installed: installed(), dev: !!dev && !installed(),
-      ready: !!paths(), available: PACK.files.length > 0 && !/REPLACE/.test(PACK.revision), downloading: !!job };
+      ready: !!paths(), available: PACK.files.length > 0 && !/REPLACE/.test(PACK.revision), supported: !!RUNTIME,
+      platform: PLATFORM, downloading: !!job };
   }
 
   // ---------------- download ----------------

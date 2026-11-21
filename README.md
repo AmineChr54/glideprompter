@@ -10,7 +10,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter.exe"><b>⬇ Download for Windows</b></a> ·
+  <a href="https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter.exe"><b>⬇ Windows</b></a> ·
+  <a href="#linux"><b>⬇ Linux</b></a> ·
+  <a href="#macos-experimental"><b>⬇ macOS (experimental)</b></a> ·
   <a href="https://aminechr54.github.io/glideprompter/app/"><b>▶ Run it in your browser</b></a> ·
   <a href="https://aminechr54.github.io/glideprompter/">Website</a>
 </p>
@@ -24,7 +26,7 @@
 ## Contents
 
 - [Features](#features)
-- [Download & run](#download--run)
+- [Download & run](#download--run) ([Windows](#windows), [Linux](#linux), [macOS](#macos-experimental))
 - [Web version](#web-version)
 - [The two windows](#the-two-windows)
 - [Scripts](#scripts)
@@ -48,13 +50,13 @@
 - **Fonts.** Choose the font family, weight, letter spacing, line spacing, text and background colour, and the alignment.
 - **Inline formatting.** Mark words **bold**, *italic*, underlined, highlighted or coloured, with a toolbar and shortcuts in the editor.
 - **Count up / count down timer.** Each speaker has a target time and a warning window (yellow). The timer turns red at zero and can count overtime (`-00:12`). Choose its corner and colours, click it to type a time, or nudge it by ±30 s.
-- **Follow mode.** The script scrolls with the speaker's voice: it moves while they talk, stops when they pause, and finds its place again after ad-libs or skipped lines. Speech recognition runs offline on your computer (English, desktop app only).
+- **Follow mode.** The script scrolls with the speaker's voice: it moves while they talk, stops when they pause, and finds its place again after ad-libs or skipped lines. Speech recognition runs offline on your computer (English, desktop app only: Windows, Linux and, experimentally, macOS).
 - **Word search.** Type what the speaker just said and press <kbd>Enter</kbd>. The prompter glides so those words land on the reading line.
 - **Stage cues.** `[PAUSE]`, `[SLIDE 3]` and similar cues are styled so they're never read out.
 - **Mirror modes** for beam-splitter glass, horizontally and/or vertically.
 - **Built-in editor** with undo/redo, a word count, the estimated speaking time and the scroll time at the current speed.
 - **OBS-friendly.** The desktop app keeps rendering at full frame rate even when it's covered or unfocused.
-- **Portable.** It's a single `.exe` with no installer and needs no internet.
+- **Portable.** On Windows it's a single `.exe` with no installer; on Linux a single AppImage. It needs no internet.
 
 | Control window (Prompter view) | Output window |
 |---|---|
@@ -62,12 +64,38 @@
 
 ## Download & run
 
+### Windows
+
 1. Download **[`GlidePrompter.exe`](https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter.exe)** from the [latest release](https://github.com/AmineChr54/glideprompter/releases/latest).
 2. Put it in any folder and double-click it.
    Windows may show *"Windows protected your PC"*. Click **More info → Run anyway**. The app is not code-signed.
 3. The first time it runs, it creates a **`GlidePrompter Scripts`** folder next to the `.exe` with two sample scripts. Your scripts and saved settings (`profiles.json`) live in that folder. If the folder next to the `.exe` isn't writable, it uses `Documents\GlidePrompter Scripts` instead.
 
 It runs on Windows 10 and 11 (x64).
+
+### Linux
+
+Two downloads from the [latest release](https://github.com/AmineChr54/glideprompter/releases/latest), both x64:
+
+- **[`GlidePrompter-linux-x86_64.AppImage`](https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter-linux-x86_64.AppImage)**: runs on most distributions without installing. Make it executable (`chmod +x GlidePrompter-linux-x86_64.AppImage`) and start it. If it doesn't start, install FUSE 2 (`sudo apt install libfuse2t64` on Ubuntu 24.04, `libfuse2` on older versions).
+- **[`GlidePrompter-linux-amd64.deb`](https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter-linux-amd64.deb)** for Debian / Ubuntu: `sudo apt install ./GlidePrompter-linux-amd64.deb`, then start *GlidePrompter* from the app menu.
+
+Scripts live in `~/Documents/GlidePrompter Scripts` (your home folder if there's no Documents folder). For OBS on Linux, capture the *GlidePrompter Output* window with **Window Capture (Xcomposite)** on X11, or **Screen Capture (PipeWire)** on Wayland.
+
+### macOS (experimental)
+
+> **Experimental and untested.** These builds are made on Linux, without a Mac to test on, and they are **not signed** by Apple. If something doesn't work, please [open an issue](https://github.com/AmineChr54/glideprompter/issues/1).
+
+1. Download **[`GlidePrompter-mac-arm64.zip`](https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter-mac-arm64.zip)** (Apple silicon: M1 and newer) or **[`GlidePrompter-mac-x64.zip`](https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter-mac-x64.zip)** (Intel), unzip it and move *GlidePrompter* to *Applications*.
+2. Because the app isn't signed, macOS blocks it at first. In Terminal, run once:
+   ```sh
+   xattr -dr com.apple.quarantine /Applications/GlidePrompter.app
+   codesign --force --deep --sign - /Applications/GlidePrompter.app
+   ```
+   The first line removes the "downloaded from the internet" flag, the second gives the app a local signature on your own Mac (needed on Apple silicon). Both use Apple's own tools.
+3. Start it. For Follow mode, allow the microphone when macOS asks.
+
+Scripts live in `~/Documents/GlidePrompter Scripts`. Shortcuts use <kbd>⌘</kbd> wherever this page says <kbd>Ctrl</kbd> (<kbd>Ctrl</kbd> works too).
 
 ## Web version
 
@@ -151,7 +179,7 @@ Press <kbd>Ctrl</kbd>+<kbd>F</kbd> and type a few words you just heard. Capitals
 
 Press <kbd>M</kbd> or the microphone button in the toolbar, and the prompter follows the speaker's voice.
 
-- **First use:** Follow mode needs the English voice pack. Download it once from **Follow mode** in the left panel (about 150 MB). It's stored in your user data folder, is checked before use, and can be removed again. After that, everything runs offline. Audio never leaves the computer.
+- **First use:** Follow mode needs the English voice pack. Download it once from **Follow mode** in the left panel (about 150–165 MB, depending on the system). It's stored in your user data folder, is checked before use, and can be removed again. After that, everything runs offline. Audio never leaves the computer.
 - **Microphone:** choose the input in the same panel. A lavalier or a feed from the sound desk works much better than the laptop's own microphone. The meter under the button shows the level.
 - **What it does:** the text glides at the speaker's pace while they talk, and stops within about a tenth of a second when they pause. If they ad-lib, it waits. If they skip ahead or go back, it jumps there once a few words in a row clearly match. While it is unsure it says *Searching…* and only creeps forward very slowly.
 - **Taking over:** the arrow keys, the mouse wheel, search and clicking a paragraph move the prompter, and Follow mode continues from the new spot. <kbd>Space</kbd> (Play), <kbd>Home</kbd>, <kbd>End</kbd> or <kbd>M</kbd> switch back to manual control.
@@ -217,6 +245,9 @@ cd glideprompter
 npm install
 npm start          # run the desktop app (scripts live in ./scripts, seeded with the samples)
 npm run dist       # build dist/GlidePrompter.exe (portable, Windows x64)
+npm run dist:linux # build the AppImage and .deb (run on Linux or WSL)
+npm run dist:mac   # build the unsigned macOS zips (arm64, x64); works on Linux / WSL too
+npm test           # unit tests
 npm run web        # rebuild the browser version into docs/app/
 ```
 
