@@ -5,210 +5,299 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GlidePrompter</title>
 <meta name="description" content="A smooth, free teleprompter for live talks, streams and OBS. Per-speaker profiles, word search, inline formatting and a count up / count down timer. Windows app or straight in your browser.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#09090b">
+<link rel="canonical" href="https://aminechr54.github.io/glideprompter/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://aminechr54.github.io/glideprompter/">
 <meta property="og:title" content="GlidePrompter: a smooth teleprompter for live talks">
-<meta property="og:description" content="Per-speaker profiles, word search, formatting and a countdown timer. Free for Windows or in your browser.">
-<meta property="og:image" content="img/control.png">
-<meta name="theme-color" content="#07070a">
+<meta property="og:description" content="One window for you, one for the speaker. Per-speaker profiles, word search, formatting and a countdown timer. Free for Windows or in your browser.">
+<meta property="og:image" content="https://aminechr54.github.io/glideprompter/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="GlidePrompter: the Control window on a laptop and the speaker's prompter on a stage monitor">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aminechr54.github.io/glideprompter/img/og.png">
 <link rel="icon" href="img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #07070a; --bg2: #0d0d12; --surface: #121218; --surface2: #191920;
-  --line: rgba(255,255,255,.08); --line2: rgba(255,255,255,.14);
-  --text: #f4f4f5; --muted: #a1a1aa; --dim: #71717a;
-  --accent: #e62b1e; --accent2: #ff6a3d; --yellow: #ffcc00; --blue: #4f7cff; --green: #34d399;
-  --radius: 18px; --max: 1180px;
-  --sans: "Inter", "Segoe UI", system-ui, sans-serif;
+  --background: #09090b; --card: #0c0c0f; --muted: #18181b; --accent-bg: #1f1f23;
+  --border: #27272a; --border-strong: #3f3f46;
+  --fg: #fafafa; --muted-fg: #a1a1aa; --dim: #71717a;
+  --primary: #e62b1e; --primary-hover: #f23a2d; --primary-soft: rgba(230,43,30,.12);
+  --yellow: #ffcc00; --blue: #4f7cff; --green: #34d399;
+  --radius: 10px; --max: 1160px;
+  --sans: "Geist", "Inter", "Segoe UI", system-ui, sans-serif;
+  --mono: "Geist Mono", "JetBrains Mono", Consolas, monospace;
   --num: "Barlow Condensed", "Bahnschrift", "Arial Narrow", sans-serif;
-  --mono: "JetBrains Mono", Consolas, monospace;
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 html, body { overflow-x: clip; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--background); color: var(--fg); font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
 img, video, svg { max-width: 100%; display: block; }
-.hero .wrap > *, .split > *, .duo > *, .grid > *, .steps > * { min-width: 0; }
 a { color: inherit; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .wrap { max-width: var(--max); margin: 0 auto; padding: 0 16px; }
 @media (min-width: 700px) { .wrap { padding: 0 28px; } }
-section { position: relative; padding: 110px 0; }
-.eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent2); }
-.eyebrow::before { content: ""; width: 18px; height: 2px; background: currentColor; border-radius: 2px; }
-h1, h2, h3 { margin: 0; letter-spacing: -.03em; line-height: 1.08; }
-h2 { font-size: clamp(32px, 4.4vw, 52px); font-weight: 800; margin: 14px 0 16px; }
-h3 { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
-.lead { font-size: clamp(17px, 1.6vw, 20px); color: var(--muted); max-width: 640px; margin: 0; }
+section { position: relative; padding: 96px 0; }
+@media (max-width: 700px) { section { padding: 72px 0; } }
+.sep { border-top: 1px solid var(--border); }
+
+h1, h2, h3 { margin: 0; letter-spacing: -.035em; line-height: 1.1; font-weight: 700; }
+h2 { font-size: clamp(30px, 4vw, 44px); margin: 14px 0 14px; }
+h3 { font-size: 17px; font-weight: 600; letter-spacing: -.01em; }
+p { margin: 0; }
+.lead { font-size: clamp(16px, 1.5vw, 18px); color: var(--muted-fg); max-width: 620px; }
 .center { text-align: center; }
 .center .lead { margin: 0 auto; }
-.grad { background: linear-gradient(92deg, #fff 0%, #ffd5c9 45%, var(--accent2) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.head { margin-bottom: 48px; }
+.accent { color: var(--primary); }
+.grad { background: linear-gradient(92deg, #fff 10%, #ffc4b8 50%, #ff6a3d 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
-/* ---------- buttons ---------- */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 22px; border-radius: 12px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1px solid var(--line2); background: rgba(255,255,255,.04); transition: transform .15s, background .2s, border-color .2s, box-shadow .2s; white-space: nowrap; }
-.btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.25); }
-.btn svg { width: 20px; height: 20px; flex: none; }
-.btn.primary { background: linear-gradient(180deg, #f2392b, #c81e12); border-color: #ff5a4c; box-shadow: 0 10px 30px -8px rgba(230,43,30,.65), inset 0 1px 0 rgba(255,255,255,.25); }
-.btn.primary:hover { box-shadow: 0 14px 40px -8px rgba(230,43,30,.8), inset 0 1px 0 rgba(255,255,255,.25); }
-.btn.big { padding: 17px 28px; font-size: 17px; border-radius: 14px; }
-.btn small { font-weight: 500; opacity: .75; font-size: 13px; }
+/* ---------- primitives (shadcn-style) ---------- */
+.badge { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--muted); font-size: 12px; font-weight: 500; color: var(--muted-fg); white-space: nowrap; }
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 8px; border: 1px solid transparent; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; white-space: nowrap; transition: background .15s, border-color .15s, color .15s, box-shadow .15s; background: none; user-select: none; }
+.btn svg { width: 16px; height: 16px; flex: none; }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 8px 24px -10px rgba(230,43,30,.8), inset 0 1px 0 rgba(255,255,255,.18); }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-outline { border-color: var(--border); background: var(--background); }
+.btn-outline:hover { background: var(--accent-bg); }
+.btn-ghost:hover { background: var(--accent-bg); }
+.btn-secondary { background: var(--muted); border-color: var(--border); }
+.btn-secondary:hover { background: var(--accent-bg); }
+.btn-lg { height: 46px; padding: 0 22px; font-size: 15px; border-radius: 10px; }
+.btn-lg svg { width: 18px; height: 18px; }
+.btn-sm { height: 32px; padding: 0 12px; font-size: 13px; border-radius: 7px; }
+.btn-icon { width: 32px; padding: 0; }
+.btn[aria-pressed="true"] { background: var(--fg); color: #09090b; border-color: var(--fg); }
+.card { border: 1px solid var(--border); background: var(--card); border-radius: 14px; }
+kbd { display: inline-flex; align-items: center; height: 22px; padding: 0 6px; font: 500 11.5px var(--mono); color: var(--fg); background: var(--muted); border: 1px solid var(--border-strong); border-bottom-width: 2px; border-radius: 6px; white-space: nowrap; vertical-align: middle; }
+code { font: 13px var(--mono); background: var(--muted); border: 1px solid var(--border); padding: 1px 6px; border-radius: 6px; color: #e4e4e7; }
+
+.seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--muted); border: 1px solid var(--border); border-radius: 9px; flex-wrap: wrap; }
+.seg button { height: 30px; padding: 0 12px; border: 0; border-radius: 6px; background: none; color: var(--muted-fg); font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; }
+.seg button:hover { color: var(--fg); }
+.seg button[aria-selected="true"], .seg button[aria-pressed="true"] { background: var(--background); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.5), 0 0 0 1px var(--border); }
+
+.input { height: 36px; width: 100%; border-radius: 8px; border: 1px solid var(--border); background: var(--background); padding: 0 12px; font-size: 14px; outline: none; transition: border-color .15s, box-shadow .15s; }
+.input:focus { border-color: var(--border-strong); box-shadow: 0 0 0 3px rgba(230,43,30,.25); }
+
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 20px; background: none; cursor: pointer; }
+input[type=range]::-webkit-slider-runnable-track { height: 6px; border-radius: 6px; background: linear-gradient(var(--primary), var(--primary)) 0 / var(--fill, 50%) 100% no-repeat, var(--accent-bg); }
+input[type=range]::-moz-range-track { height: 6px; border-radius: 6px; background: var(--accent-bg); }
+input[type=range]::-moz-range-progress { height: 6px; border-radius: 6px; background: var(--primary); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -6px; border-radius: 50%; background: #fff; border: 2px solid var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,.5); }
+input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 2px solid var(--primary); }
 
 /* ---------- nav ---------- */
-nav { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); background: rgba(7,7,10,.72); border-bottom: 1px solid var(--line); }
-nav .wrap { display: flex; align-items: center; gap: 18px; height: 64px; }
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; letter-spacing: -.02em; text-decoration: none; }
-.brand img { width: 32px; height: 32px; }
-.navlinks { display: flex; gap: 22px; margin-left: auto; font-size: 14px; color: var(--muted); }
-.navlinks a { text-decoration: none; transition: color .2s; }
-.navlinks a:hover { color: #fff; }
-nav .btn { padding: 9px 16px; font-size: 14px; border-radius: 10px; }
-@media (max-width: 880px) { .navlinks { display: none; } nav .btn.ghost { display: none; } nav .actions { margin-left: auto; } }
-nav .actions { display: flex; gap: 10px; }
+nav { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); background: rgba(9,9,11,.75); border-bottom: 1px solid var(--border); }
+nav .wrap { display: flex; align-items: center; gap: 24px; height: 60px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; letter-spacing: -.02em; text-decoration: none; }
+.brand img { width: 28px; height: 28px; }
+.navlinks { display: flex; gap: 4px; font-size: 14px; color: var(--muted-fg); }
+.navlinks a { text-decoration: none; padding: 6px 10px; border-radius: 7px; transition: color .15s, background .15s; }
+.navlinks a:hover { color: var(--fg); background: var(--muted); }
+nav .actions { display: flex; gap: 8px; margin-left: auto; }
+nav .btn { height: 34px; padding: 0 12px; font-size: 13px; }
+@media (max-width: 920px) { .navlinks { display: none; } }
+@media (max-width: 520px) { nav .btn-outline { display: none; } }
 
 /* ---------- hero ---------- */
-.hero { padding: 72px 0 90px; overflow: hidden; }
-.hero::before { content: ""; position: absolute; inset: -20% -10% auto; height: 900px; background: radial-gradient(ellipse 50% 45% at 50% 30%, rgba(230,43,30,.22), transparent 70%), radial-gradient(ellipse 30% 30% at 80% 10%, rgba(79,124,255,.12), transparent 70%); pointer-events: none; }
-.hero .wrap { position: relative; display: grid; grid-template-columns: 1fr; gap: 56px; align-items: center; }
-@media (min-width: 1000px) { .hero .wrap { grid-template-columns: 0.92fr 1.08fr; } }
-.pill-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border: 1px solid var(--line2); border-radius: 999px; font-size: 13px; color: var(--muted); background: rgba(255,255,255,.03); text-decoration: none; }
-.pill-badge b { background: var(--accent); color: #fff; border-radius: 999px; padding: 2px 9px; font-size: 12px; }
-.hero h1 { font-size: clamp(42px, 6.2vw, 76px); font-weight: 800; margin: 22px 0 20px; }
-.hero .lead { font-size: clamp(18px, 1.7vw, 21px); }
-.cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
-.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 22px; font-size: 14px; color: var(--dim); }
+.hero { padding: 88px 0 0; overflow: hidden; }
+#features { padding-top: 72px; }
+.hero::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.09) 1px, transparent 1px); background-size: 22px 22px; -webkit-mask-image: radial-gradient(ellipse 70% 55% at 50% 0%, #000 30%, transparent 75%); mask-image: radial-gradient(ellipse 70% 55% at 50% 0%, #000 30%, transparent 75%); pointer-events: none; }
+.hero::after { content: ""; position: absolute; left: 50%; top: 360px; width: 1100px; height: 700px; transform: translateX(-50%); background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(230,43,30,.22), transparent 70%); pointer-events: none; }
+.hero .wrap { position: relative; z-index: 1; }
+.hero h1 { font-size: clamp(34px, 6.4vw, 76px); letter-spacing: -.045em; max-width: 920px; margin: 0 auto; }
+.hero .lead { margin: 22px auto 0; font-size: clamp(16px, 1.6vw, 19px); max-width: 640px; }
+.cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 32px; }
+.meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 20px; margin-top: 20px; font-size: 13px; color: var(--dim); }
 .meta span { display: inline-flex; align-items: center; gap: 6px; }
-.meta svg { width: 16px; height: 16px; color: var(--green); }
+.meta svg { width: 14px; height: 14px; color: var(--green); }
+.os-note { margin-top: 14px; font-size: 13px; color: var(--muted-fg); }
+.os-note a { color: var(--fg); text-underline-offset: 3px; }
 
-/* monitor mockup */
-.monitor { position: relative; }
-.monitor .screen { position: relative; border-radius: 16px; padding: 12px; background: linear-gradient(180deg, #26262d, #141418); box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 50px 100px -30px rgba(0,0,0,.9), 0 30px 80px -40px rgba(230,43,30,.5); }
-.monitor .screen > * { border-radius: 6px; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #000; }
-.monitor .stand { width: 22%; height: 46px; margin: 0 auto; background: linear-gradient(180deg, #1c1c22, #101014); clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%); }
-.monitor .foot { width: 40%; height: 8px; margin: 0 auto; border-radius: 6px 6px 2px 2px; background: #1d1d23; box-shadow: 0 12px 30px rgba(0,0,0,.6); }
-.live { position: absolute; top: 24px; left: 24px; display: flex; align-items: center; gap: 7px; padding: 4px 10px; border-radius: 999px; background: rgba(0,0,0,.6); font-size: 12px; font-weight: 600; letter-spacing: .06em; backdrop-filter: blur(6px); }
-.live i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 0 rgba(230,43,30,.7); animation: pulse 1.6s infinite; }
-@media (max-width: 600px) { .live { top: 16px; left: 16px; font-size: 10px; padding: 3px 8px; } }
-@keyframes pulse { 70% { box-shadow: 0 0 0 9px rgba(230,43,30,0); } 100% { box-shadow: 0 0 0 0 rgba(230,43,30,0); } }
-
-/* ---------- logos strip ---------- */
-.strip { padding: 0 0 20px; }
-.strip .wrap { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 36px; color: var(--dim); font-size: 14px; font-weight: 500; }
-.strip span { display: inline-flex; align-items: center; gap: 8px; }
-.strip svg { width: 18px; height: 18px; opacity: .8; }
-
-/* ---------- two windows ---------- */
-.duo { display: grid; gap: 28px; margin-top: 60px; grid-template-columns: 1fr; align-items: end; }
-@media (min-width: 960px) { .duo { grid-template-columns: 1.25fr .75fr; } }
-.laptop .lid { border-radius: 14px 14px 4px 4px; padding: 10px 10px 14px; background: linear-gradient(180deg, #2a2a31, #17171b); box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 40px 80px -30px rgba(0,0,0,.9); }
+.rig { position: relative; max-width: 1000px; margin: 64px auto 0; padding-bottom: 20%; }
+.laptop { width: 86%; }
+.laptop .lid { position: relative; border-radius: 14px 14px 4px 4px; padding: 10px 10px 14px; background: linear-gradient(180deg, #2a2a31, #17171b); box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 40px 80px -30px rgba(0,0,0,.9); }
 .laptop .lid img { border-radius: 4px; width: 100%; }
 .laptop .base { height: 16px; margin: 0 -5%; border-radius: 0 0 16px 16px; background: linear-gradient(180deg, #34343c, #18181c); position: relative; }
 .laptop .base::after { content: ""; position: absolute; left: 42%; right: 42%; top: 0; height: 6px; border-radius: 0 0 8px 8px; background: #0e0e11; }
-.caption { margin-top: 18px; display: flex; gap: 12px; align-items: flex-start; color: var(--muted); font-size: 15px; }
-.caption b { color: var(--text); }
-.tag { flex: none; font: 600 12px var(--mono); padding: 3px 8px; border-radius: 6px; background: rgba(230,43,30,.15); color: #ff8a7f; border: 1px solid rgba(230,43,30,.35); }
-.tag.blue { background: rgba(79,124,255,.12); color: #9db4ff; border-color: rgba(79,124,255,.35); }
+.monitor .screen { position: relative; border-radius: 12px; padding: 8px; background: linear-gradient(180deg, #26262d, #141418); box-shadow: 0 0 0 1px rgba(255,255,255,.1), 0 40px 80px -20px rgba(0,0,0,.95), 0 20px 60px -30px rgba(230,43,30,.6); }
+.monitor .screen > img, .monitor .screen > video { border-radius: 5px; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #000; }
+.monitor .stand { width: 22%; height: 26px; margin: 0 auto; background: linear-gradient(180deg, #1c1c22, #101014); clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%); }
+.monitor .foot { width: 40%; height: 7px; margin: 0 auto; border-radius: 6px 6px 2px 2px; background: #1d1d23; box-shadow: 0 12px 30px rgba(0,0,0,.6); }
+.rig .stage { position: absolute; right: 0; bottom: 0; width: 52%; z-index: 2; }
+.label { position: absolute; top: -13px; left: 18px; z-index: 3; display: flex; align-items: center; gap: 7px; padding: 4px 11px; border-radius: 999px; background: #16161b; border: 1px solid var(--border-strong); font-size: 11.5px; font-weight: 600; letter-spacing: .06em; white-space: nowrap; }
+.label i { width: 7px; height: 7px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 0 0 rgba(230,43,30,.7); animation: pulse 1.6s infinite; }
+.label.op i { background: var(--blue); animation: none; }
+@media (max-width: 600px) { .label { top: -11px; left: 10px; font-size: 9.5px; padding: 3px 8px; } .monitor .stand { height: 14px; } }
+@keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(230,43,30,0); } 100% { box-shadow: 0 0 0 0 rgba(230,43,30,0); } }
 
-/* ---------- feature grid ---------- */
-.grid { display: grid; gap: 16px; margin-top: 56px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-.card { position: relative; padding: 26px; border-radius: var(--radius); background: linear-gradient(180deg, var(--surface), var(--bg2)); border: 1px solid var(--line); overflow: hidden; transition: border-color .25s, transform .25s; }
-.card:hover { border-color: rgba(230,43,30,.45); transform: translateY(-2px); }
-.card::after { content: ""; position: absolute; inset: auto -40% -60% auto; width: 220px; height: 220px; background: radial-gradient(circle, rgba(230,43,30,.12), transparent 65%); pointer-events: none; opacity: 0; transition: opacity .3s; }
-.card:hover::after { opacity: 1; }
-.ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: rgba(230,43,30,.12); border: 1px solid rgba(230,43,30,.3); color: #ff7b6f; margin-bottom: 18px; }
-.ic svg { width: 22px; height: 22px; }
-.card p { margin: 8px 0 0; color: var(--muted); font-size: 15px; }
+/* ---------- tour (tabs) ---------- */
+.tabs-bar { display: flex; justify-content: center; margin-bottom: 28px; }
+.tour { display: grid; gap: 32px; align-items: center; grid-template-columns: 1fr; }
+@media (min-width: 960px) { .tour { grid-template-columns: 1.45fr 1fr; gap: 48px; } }
+.frame { border: 1px solid var(--border); background: var(--card); border-radius: 14px; overflow: hidden; box-shadow: 0 30px 80px -40px rgba(0,0,0,.9); }
+.frame .bar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.frame .bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--border-strong); }
+.frame .bar span { margin-left: 8px; font: 12px var(--mono); color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.frame img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top left; background: #000; }
+.panel[hidden] { display: none; }
+.panel.show { animation: fadeUp .35s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.list { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 12px; }
+.list li { display: flex; gap: 10px; color: var(--muted-fg); }
+.list li svg { flex: none; width: 18px; height: 18px; color: var(--primary); margin-top: 3px; }
+.list b { color: var(--fg); font-weight: 600; }
 
-/* ---------- split rows ---------- */
-.split { display: grid; gap: 48px; align-items: center; grid-template-columns: 1fr; }
-@media (min-width: 960px) { .split { grid-template-columns: 1fr 1fr; gap: 72px; } .split.rev > :first-child { order: 2; } }
-.shot { border-radius: 14px; overflow: hidden; border: 1px solid var(--line2); box-shadow: 0 40px 80px -40px rgba(0,0,0,.9); background: #000; }
-.browser { border-radius: 14px; overflow: hidden; border: 1px solid var(--line2); background: #16161b; box-shadow: 0 40px 80px -40px rgba(0,0,0,.95); }
-.browser .bar { display: flex; align-items: center; gap: 7px; padding: 11px 14px; border-bottom: 1px solid var(--line); }
-.browser .bar i { width: 11px; height: 11px; border-radius: 50%; background: #3a3a42; }
-.browser .bar i:nth-child(1) { background: #ff5f57; } .browser .bar i:nth-child(2) { background: #febc2e; } .browser .bar i:nth-child(3) { background: #28c840; }
-.browser .bar span { margin-left: 12px; flex: 1; max-width: 360px; font: 12px var(--mono); color: var(--dim); background: #0d0d10; border-radius: 6px; padding: 4px 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.list { list-style: none; padding: 0; margin: 26px 0 0; display: grid; gap: 14px; }
-.list li { display: flex; gap: 12px; color: var(--muted); }
-.list li svg { flex: none; width: 22px; height: 22px; color: var(--accent2); margin-top: 1px; }
-.list b { color: var(--text); }
+/* ---------- bento ---------- */
+.bento { display: grid; gap: 14px; margin-top: 64px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .bento { grid-template-columns: repeat(2, 1fr); } .bento .wide { grid-column: span 2; } }
+@media (min-width: 1040px) { .bento { grid-template-columns: repeat(4, 1fr); } .bento .wide { grid-column: span 2; } }
+.tile { position: relative; padding: 22px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; transition: border-color .2s; }
+.tile:hover { border-color: var(--border-strong); }
+.tile p { color: var(--muted-fg); font-size: 14px; }
+.tile .ic { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: var(--primary-soft); border: 1px solid rgba(230,43,30,.3); color: #ff7b6f; margin-bottom: 6px; }
+.tile .ic svg { width: 18px; height: 18px; }
+.tile .demo { margin-top: auto; padding-top: 14px; }
+.tile .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.tile .more { font-size: 13px; color: var(--fg); text-decoration: none; display: inline-flex; gap: 6px; align-items: center; margin-top: auto; padding-top: 12px; }
+.tile .more:hover { text-decoration: underline; text-underline-offset: 3px; }
+.speakers { display: grid; gap: 6px; }
+.speakers button { display: flex; align-items: center; gap: 10px; width: 100%; height: 38px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--background); cursor: pointer; font-size: 13px; text-align: left; transition: border-color .15s, background .15s; }
+.speakers button:hover { background: var(--muted); }
+.speakers button[aria-pressed="true"] { border-color: rgba(230,43,30,.6); background: rgba(230,43,30,.08); }
+.speakers .n { color: var(--dim); font: 600 12px var(--mono); }
+.speakers .t { margin-left: auto; font: 12px var(--mono); color: var(--muted-fg); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; min-height: 52px; align-content: flex-start; }
+.chips span { font: 11.5px var(--mono); padding: 3px 8px; border-radius: 6px; background: var(--muted); border: 1px solid var(--border); color: var(--muted-fg); }
+.tchip { display: inline-block; font: 700 30px/1 var(--num); letter-spacing: .02em; padding: 5px 10px; border-radius: 7px; font-variant-numeric: tabular-nums; background: rgba(255,255,255,.06); }
+.tchip.warn { background: var(--yellow); color: #111; } .tchip.over { background: #e0241b; color: #fff; }
 
-/* markup demo */
-.markup { margin-top: 28px; border-radius: 14px; border: 1px solid var(--line2); background: #0b0b0f; overflow: hidden; }
-.markup .row { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); }
-.markup .row:first-child { border-top: 0; }
-.markup code { padding: 11px 16px; font: 14px var(--mono); color: #d4d4d8; border-right: 1px solid var(--line); overflow-wrap: anywhere; }
-.markup .out { padding: 11px 16px; font-size: 16px; }
-.markup .head { font: 600 11px var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
-.markup mark { background: rgba(255,214,10,.35); color: inherit; border-radius: 3px; padding: 0 3px; }
-.cue { font-size: .72em; font-weight: 700; letter-spacing: .04em; color: #d6a531; }
-.cue.slide { color: #fff; background: #2f6fd6; border-radius: 1em; padding: 1px 8px; }
+/* ---------- mini prompter (same look as the Output window) ---------- */
+.tp { position: relative; aspect-ratio: 16 / 9; background: #000; color: #fff; border-radius: 8px; overflow: hidden; container-type: inline-size; user-select: none; }
+.tp-stage { position: absolute; inset: 0; transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+.tp-stage.mh { transform: scaleX(-1); } .tp-stage.mv { transform: scaleY(-1); } .tp-stage.mh.mv { transform: scale(-1, -1); }
+.tp-view { position: absolute; inset: 0; overflow: hidden; }
+.tp-content { position: absolute; left: 0; right: 0; top: 0; padding: 0 12%; font: 400 var(--tp-size, 3.75cqw)/1.8 Arial, Helvetica, sans-serif; will-change: transform; }
+.tp-content p { margin: 0; overflow-wrap: break-word; }
+.tp-content b { font-weight: 700; }
+.tp-content mark { background: rgba(255,214,10,.35); color: inherit; border-radius: .12em; padding: 0 .08em; }
+.fc-red { color: #ff4d4d; } .fc-orange { color: #ff9f43; } .fc-yellow { color: #ffd60a; } .fc-green { color: #4cd964; } .fc-blue { color: #5aa9ff; } .fc-purple { color: #c084fc; } .fc-white { color: #fff; } .fc-gray { color: #8e8e93; }
+.cue { font-size: .6em; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; vertical-align: .15em; }
+.cue-pause { color: #d6a531; opacity: .85; } .cue-action { color: #f08a4b; font-style: italic; opacity: .85; }
+.cue-slide { color: #fff; background: #2f6fd6; border-radius: .6em; padding: .05em .6em; font-size: .5em; }
+.tp-guide { position: absolute; left: 0; right: 0; top: 35%; height: 0; pointer-events: none; }
+.tp-guide::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: calc(var(--tp-size, 3.75cqw) * 1.8); transform: translateY(-50%); background: rgba(255,255,255,.045); }
+.tp-guide i { position: absolute; top: 0; width: 0; height: 0; border-top: .95cqw solid transparent; border-bottom: .95cqw solid transparent; transform: translateY(-50%); }
+.tp-guide .l { left: 1.5%; border-left: 1.35cqw solid #e62b1e; } .tp-guide .r { right: 1.5%; border-right: 1.35cqw solid #e62b1e; }
+.tp-timer { position: absolute; top: .6cqw; right: 1.1cqw; font: 700 max(2.5cqw, 13px)/1 var(--num); letter-spacing: .02em; padding: .08em .25em; border-radius: .12em; background: rgba(0,0,0,.75); font-variant-numeric: tabular-nums; transition: color .3s, background .3s; }
+.tp-timer.warn { background: var(--yellow); color: #111; } .tp-timer.over { background: #e0241b; color: #fff; }
+.tp-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,.12); }
+.tp-progress i { display: block; height: 100%; background: #e62b1e; transform-origin: left; transform: scaleX(0); }
+::highlight(tp-hit) { background-color: rgba(255,204,0,.28); }
+::highlight(tp-cur) { background-color: #ffcc00; color: #000; }
 
-/* timer demo */
-.timers { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
-.tchip { flex: 1 1 150px; padding: 18px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
-.tchip .lbl { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); font-weight: 600; }
-.tchip .t { display: inline-block; margin-top: 10px; font: 700 44px/1 var(--num); letter-spacing: .02em; padding: 6px 12px; border-radius: 8px; background: rgba(0,0,0,.75); color: #fff; transition: background .4s, color .4s; font-variant-numeric: tabular-nums; }
-.tchip .t.warn { background: var(--yellow); color: #111; }
-.tchip .t.over { background: #e0241b; color: #fff; }
-.livetimer { position: relative; }
-.livetimer .shot { position: relative; }
-.livetimer .overlay { position: absolute; right: 2.2%; top: 3%; font: 700 clamp(22px, 3.2vw, 40px)/1 var(--num); padding: .08em .3em; border-radius: .14em; background: rgba(0,0,0,.75); color: #fff; transition: background .4s, color .4s; font-variant-numeric: tabular-nums; }
-.livetimer .overlay.warn { background: var(--yellow); color: #111; }
-.livetimer .overlay.over { background: #e0241b; }
+/* ---------- try it ---------- */
+.try { display: grid; gap: 14px; }
+.try .screen-wrap { padding: 10px; border-radius: 16px; background: linear-gradient(180deg, #1f1f25, #111114); border: 1px solid var(--border); box-shadow: 0 40px 100px -40px rgba(230,43,30,.45); }
+.try .screen-wrap .tp { border-radius: 8px; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 12px; }
+.toolbar .speed { display: flex; align-items: center; gap: 10px; min-width: 200px; flex: 1 1 200px; font-size: 13px; color: var(--muted-fg); }
+.toolbar .speed b { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 18px; display: inline-block; }
+.search { position: relative; display: flex; align-items: center; gap: 4px; flex: 3 1 320px; }
+.search svg.mag { position: absolute; left: 11px; width: 16px; height: 16px; color: var(--dim); pointer-events: none; }
+.search .input { padding-left: 34px; padding-right: 64px; }
+.search .count { position: absolute; right: 84px; font: 12px var(--mono); color: var(--dim); pointer-events: none; }
+.suggest { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 0 12px 12px; font-size: 13px; color: var(--dim); }
+.suggest button { height: 28px; padding: 0 10px; border-radius: 999px; border: 1px dashed var(--border-strong); background: none; color: var(--muted-fg); font-size: 12.5px; cursor: pointer; transition: border-color .15s, color .15s, background .15s; }
+.suggest button:hover { border-style: solid; color: var(--fg); background: var(--muted); }
+.hint { font-size: 12.5px; color: var(--dim); text-align: center; margin-top: 4px; }
+@media (max-width: 700px) { .hint { display: none; } .hero h1 br { display: none; } }
 
-/* stage diagram */
-.diagram { margin-top: 56px; border-radius: 22px; border: 1px solid var(--line); background: radial-gradient(ellipse at 50% 0%, rgba(230,43,30,.08), transparent 60%), var(--bg2); padding: clamp(18px, 3vw, 40px); }
+/* ---------- formatting playground ---------- */
+.play { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 960px) { .play { grid-template-columns: 1fr 1.1fr; align-items: stretch; } }
+.editor { display: flex; flex-direction: column; overflow: hidden; }
+.editor .tools { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; border-bottom: 1px solid var(--border); }
+.editor .tools .sepv { width: 1px; background: var(--border); margin: 4px 4px; }
+.swatch { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 7px; border: 0; background: none; cursor: pointer; }
+.swatch:hover { background: var(--accent-bg); }
+.swatch i { width: 14px; height: 14px; border-radius: 50%; }
+.editor textarea { flex: 1; min-height: 210px; resize: vertical; border: 0; outline: none; background: none; padding: 14px 16px; font: 13.5px/1.7 var(--mono); color: #e4e4e7; }
+.editor .foot { display: flex; gap: 14px; padding: 9px 14px; border-top: 1px solid var(--border); font-size: 12px; color: var(--dim); }
+.preview { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+.preview .cap { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px 0; font-size: 12px; color: var(--dim); }
+.cheat { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 14px; }
+@media (min-width: 560px) { .cheat { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 960px) { .cheat { grid-template-columns: repeat(3, 1fr); } }
+.cheat div { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--border); font-size: 14px; }
+.cheat code { background: none; border: 0; padding: 0; color: var(--muted-fg); }
+
+/* ---------- timer ---------- */
+.split { display: grid; gap: 40px; align-items: center; grid-template-columns: 1fr; }
+@media (min-width: 960px) { .split { grid-template-columns: 1.1fr 1fr; gap: 64px; } }
+.ctrl { display: grid; gap: 14px; margin-top: 26px; padding: 18px; }
+.ctrl .r { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.ctrl .k { width: 86px; font-size: 13px; color: var(--muted-fg); }
+.ctrl .btns { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ---------- setup ---------- */
+.diagram { padding: clamp(16px, 3vw, 36px); background: radial-gradient(ellipse at 50% 0%, rgba(230,43,30,.07), transparent 60%), var(--card); }
 .diagram svg { width: 100%; height: auto; }
 .flow { stroke-dasharray: 6 8; animation: dash 1.2s linear infinite; }
 @keyframes dash { to { stroke-dashoffset: -28; } }
+.steps { display: grid; gap: 14px; margin-top: 14px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); counter-reset: s; }
+.step { padding: 22px; counter-increment: s; }
+.step::before { content: counter(s); display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--muted); border: 1px solid var(--border-strong); font: 600 13px var(--mono); margin-bottom: 14px; }
+.step p { color: var(--muted-fg); margin-top: 6px; font-size: 14px; }
+.table { margin-top: 14px; overflow-x: auto; }
+.table table { width: 100%; border-collapse: collapse; min-width: 560px; }
+.table th, .table td { padding: 13px 18px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+.table tr:last-child td { border-bottom: 0; }
+.table th { font-size: 12.5px; font-weight: 500; color: var(--dim); }
+.table td:first-child { color: var(--muted-fg); }
+.yes { color: var(--green); } .no { color: var(--dim); }
 
-/* compare */
-.compare { margin-top: 50px; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
-.compare table { width: 100%; border-collapse: collapse; min-width: 560px; }
-.compare th, .compare td { padding: 15px 20px; text-align: left; border-bottom: 1px solid var(--line); font-size: 15px; }
-.compare tr:last-child td { border-bottom: 0; }
-.compare th { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--dim); background: var(--surface); }
-.compare td:first-child { color: var(--muted); }
-.yes { color: var(--green); font-weight: 600; } .no { color: var(--dim); }
+/* ---------- shortcuts ---------- */
+.keys { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); }
+.key { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 10px; background: var(--card); border: 1px solid var(--border); font-size: 14px; color: var(--muted-fg); transition: border-color .2s, background .2s, color .2s, transform .2s; }
+.key.hit { border-color: var(--primary); background: rgba(230,43,30,.1); color: var(--fg); transform: translateY(-1px); }
+.pressed { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; min-height: 30px; font-size: 13px; color: var(--dim); }
 
-/* steps */
-.steps { display: grid; gap: 16px; margin-top: 56px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); counter-reset: s; }
-.step { padding: 28px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); counter-increment: s; }
-.step::before { content: counter(s); display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--accent); font-weight: 800; margin-bottom: 16px; box-shadow: 0 0 0 6px rgba(230,43,30,.15); }
-.step p { color: var(--muted); margin: 8px 0 0; font-size: 15px; }
-.step code { font: 13px var(--mono); background: #0b0b0f; border: 1px solid var(--line); padding: 1px 6px; border-radius: 5px; color: #e4e4e7; }
+/* ---------- faq accordion ---------- */
+.acc { max-width: 760px; margin: 0 auto; border-top: 1px solid var(--border); }
+.acc-item { border-bottom: 1px solid var(--border); }
+.acc-item h3 { font-size: 15.5px; font-weight: 500; letter-spacing: 0; }
+.acc-trigger { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 2px; border: 0; background: none; cursor: pointer; text-align: left; font-weight: 500; }
+.acc-trigger:hover span { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--border-strong); }
+.acc-trigger svg { width: 16px; height: 16px; color: var(--muted-fg); flex: none; transition: transform .25s; }
+.acc-trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+.acc-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s ease; }
+.acc-panel > div { overflow: hidden; }
+.acc-panel.open { grid-template-rows: 1fr; }
+.acc-panel p { padding: 0 2px 18px; color: var(--muted-fg); font-size: 14.5px; }
 
-/* shortcuts */
-.keys { display: grid; gap: 10px; margin-top: 50px; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); }
-.key { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; color: var(--muted); }
-kbd { font: 600 12px var(--mono); color: #fff; background: linear-gradient(180deg, #2b2b33, #1c1c22); border: 1px solid #3b3b45; border-bottom-width: 3px; border-radius: 7px; padding: 3px 8px; white-space: nowrap; }
-
-/* faq */
-.faq { max-width: 820px; margin: 50px auto 0; display: grid; gap: 12px; }
-details { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); padding: 0 22px; }
-details[open] { border-color: var(--line2); }
-summary { cursor: pointer; list-style: none; padding: 19px 0; font-weight: 600; display: flex; justify-content: space-between; gap: 16px; }
-summary::-webkit-details-marker { display: none; }
-summary::after { content: "+"; font-size: 22px; line-height: 1; color: var(--accent2); transition: transform .2s; }
-details[open] summary::after { transform: rotate(45deg); }
-details p { margin: 0 0 20px; color: var(--muted); }
-
-/* final cta */
+/* ---------- final ---------- */
 .final { text-align: center; overflow: hidden; }
-.final::before { content: ""; position: absolute; left: 50%; top: 50%; width: 900px; height: 500px; transform: translate(-50%, -50%); background: radial-gradient(ellipse, rgba(230,43,30,.25), transparent 65%); pointer-events: none; }
+.final::before { content: ""; position: absolute; left: 50%; top: 50%; width: 900px; height: 500px; transform: translate(-50%, -50%); background: radial-gradient(ellipse, rgba(230,43,30,.2), transparent 65%); pointer-events: none; }
 .final .wrap { position: relative; }
-.final img.logo { width: 96px; height: 96px; margin: 0 auto 24px; filter: drop-shadow(0 20px 40px rgba(230,43,30,.4)); }
-.final .cta { justify-content: center; }
-
-footer { border-top: 1px solid var(--line); padding: 36px 0 50px; color: var(--dim); font-size: 14px; }
+.final img.logo { width: 80px; height: 80px; margin: 0 auto 22px; filter: drop-shadow(0 20px 40px rgba(230,43,30,.4)); }
+footer { border-top: 1px solid var(--border); padding: 30px 0 44px; color: var(--dim); font-size: 13px; }
 footer .wrap { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: center; justify-content: space-between; }
-footer a { color: var(--muted); text-decoration: none; }
-footer a:hover { color: #fff; }
+footer a { color: var(--muted-fg); text-decoration: none; }
+footer a:hover { color: var(--fg); }
 
-/* reveal on scroll */
-.reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
 .reveal.in { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } .flow, .live i { animation: none; } html { scroll-behavior: auto; } }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } .flow, .label i { animation: none; } html { scroll-behavior: auto; } .panel.show { animation: none; } }
 </style>
 </head>
 <body>
@@ -219,208 +308,346 @@ footer a:hover { color: #fff; }
   <symbol id="i-gh" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 2.9.8.1-.6.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4.5v15l12-7.5z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path fill="currentColor" d="M6 4.5h4.2v15H6zm7.8 0H18v15h-4.2z"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="m6 15 6-6 6 6"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></g></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5"/></symbol>
 </svg>
 
 <nav>
   <div class="wrap">
     <a class="brand" href="#top"><img src="img/logo-256.png" alt="">GlidePrompter</a>
     <div class="navlinks">
-      <a href="#features">Features</a><a href="#formatting">Formatting</a><a href="#timer">Timer</a><a href="#setup">Setup</a><a href="#shortcuts">Shortcuts</a><a href="#faq">FAQ</a>
+      <a href="#features">Features</a><a href="#try">Try it</a><a href="#formatting">Formatting</a><a href="#timer">Timer</a><a href="#setup">Setup</a><a href="#faq">FAQ</a>
     </div>
-    <div class="actions">
-      <a class="btn ghost" href="app/" target="_blank" rel="noopener">Open web app</a>
-      <a class="btn primary" href="https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter.exe">Download</a>
+    <div class="actions" id="navActions">
+      <a class="btn btn-outline" href="https://github.com/AmineChr54/glideprompter" aria-label="GitHub"><svg><use href="#i-gh"/></svg><span>GitHub</span></a>
+      <a class="btn btn-primary" data-os-primary href="https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter.exe">Download</a>
     </div>
   </div>
 </nav>
 
-<header class="hero" id="top">
+<header class="hero center" id="top">
   <div class="wrap">
-    <div>
-      <a class="pill-badge" href="https://github.com/AmineChr54/glideprompter/releases/latest"><b>v1.1</b> Count-down timer, fonts &amp; formatting</a>
-      <h1>Your script, <span class="grad">gliding</span> at the speed you speak.</h1>
-      <p class="lead">GlidePrompter is a smooth, free teleprompter for live talks, streams and recordings. It has one window for the speaker or OBS and one for the operator. Every speaker keeps their own look, place and timer.</p>
-      <div class="cta">
-        <a class="btn primary big" href="https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter.exe">
-          <svg><use href="#i-win"/></svg> Download for Windows</a>
-        <a class="btn big" href="app/" target="_blank" rel="noopener"><svg><use href="#i-globe"/></svg> Run it in your browser</a>
-      </div>
-      <div class="meta">
-        <span><svg><use href="#i-check"/></svg>Free &amp; open source</span>
-        <span><svg><use href="#i-check"/></svg>Single portable .exe, no install</span>
-        <span><svg><use href="#i-check"/></svg>Works offline</span>
-      </div>
+    <h1>Your script, <span class="grad">gliding</span> at<br> the speed you speak.</h1>
+    <p class="lead">A smooth, free teleprompter for live talks, streams and recordings. One window for you, one for the speaker. Every speaker keeps their own look, place and timer.</p>
+    <div class="cta" id="heroCta">
+      <a class="btn btn-primary btn-lg" data-cta="win" href="https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter.exe"><svg><use href="#i-win"/></svg>Download for Windows</a>
+      <a class="btn btn-outline btn-lg" data-cta="web" href="app/" target="_blank" rel="noopener"><svg><use href="#i-globe"/></svg>Run it in your browser</a>
     </div>
-    <div class="monitor reveal">
-      <div class="screen">
-        <video src="img/prompter-demo.mp4" poster="img/demo-poster.webp" autoplay muted loop playsinline aria-label="The prompter window scrolling a sample talk"></video>
-        <div class="live"><i></i>OUTPUT WINDOW</div>
+    <p class="os-note" id="osNote" hidden></p>
+    <div class="meta">
+      <span><svg><use href="#i-check"/></svg>Free &amp; open source</span>
+      <span><svg><use href="#i-check"/></svg>Single portable .exe, no install</span>
+      <span><svg><use href="#i-check"/></svg>Works offline</span>
+    </div>
+
+    <div class="rig reveal">
+      <div class="laptop">
+        <div class="lid">
+          <img src="img/control.webp" alt="Your screen: the Control window with the speaker list, settings and a live miniature of the prompter">
+          <div class="label op"><i></i>YOUR SCREEN</div>
+        </div>
+        <div class="base"></div>
       </div>
-      <div class="stand"></div><div class="foot"></div>
+      <div class="monitor stage">
+        <div class="screen">
+          <video src="img/prompter-demo.mp4" poster="img/demo-poster.webp" autoplay muted loop playsinline aria-label="The speaker's prompter scrolling a sample talk"></video>
+          <div class="label"><i></i>SPEAKER'S PROMPTER</div>
+        </div>
+        <div class="stand"></div><div class="foot"></div>
+      </div>
     </div>
   </div>
 </header>
 
-<div class="strip">
-  <div class="wrap">
-    <span><svg><use href="#i-check"/></svg>OBS window capture</span>
-    <span><svg><use href="#i-check"/></svg>Confidence monitors</span>
-    <span><svg><use href="#i-check"/></svg>Beam-splitter glass (mirror mode)</span>
-    <span><svg><use href="#i-check"/></svg>Talks, events &amp; live streams</span>
-  </div>
-</div>
-
 <section id="features">
   <div class="wrap">
-    <div class="center reveal">
-      <span class="eyebrow">Two windows, one job</span>
+    <div class="center head reveal">
+      <span class="badge"><span class="dot"></span>Two windows, one job</span>
       <h2>The speaker reads. <span class="grad">You drive.</span></h2>
-      <p class="lead">The Output window shows only the script, a reading line and the timer, ready to capture in OBS or put on a stage monitor. The Control window has everything else.</p>
+      <p class="lead">The Output window shows only the script, a reading line and the timer. The Control window has everything else.</p>
     </div>
-    <div class="duo">
-      <div class="reveal">
-        <div class="laptop"><div class="lid"><img src="img/control.webp" alt="The Control window: toolbar, speaker list, settings and the script overview with the current paragraph highlighted" loading="lazy"></div><div class="base"></div></div>
-        <div class="caption"><span class="tag">CONTROL</span><span><b>Operator view.</b> A live miniature of the speaker's screen with the script before and after it, the speaker list with progress and time, and every setting one click away.</span></div>
+
+    <div data-tabs class="reveal">
+      <div class="tabs-bar"><div class="seg" role="tablist" aria-label="App tour">
+        <button role="tab" aria-selected="true" aria-controls="tp-control" id="tab-control">Control</button>
+        <button role="tab" aria-selected="false" aria-controls="tp-output" id="tab-output" tabindex="-1">Output</button>
+        <button role="tab" aria-selected="false" aria-controls="tp-editor" id="tab-editor" tabindex="-1">Editor</button>
+        <button role="tab" aria-selected="false" aria-controls="tp-search" id="tab-search" tabindex="-1">Search</button>
+      </div></div>
+
+      <div class="panel tour" role="tabpanel" id="tp-control" aria-labelledby="tab-control">
+        <div class="frame"><div class="bar"><i></i><i></i><i></i><span>GlidePrompter Control</span></div><img src="img/control.webp" alt="The Control window: toolbar, speaker list, settings and the script with the speaker's screen framed" loading="lazy"></div>
+        <div>
+          <h3 style="font-size:22px">Operator view</h3>
+          <ul class="list">
+            <li><svg><use href="#i-check"/></svg><span><b>A live miniature</b> of the speaker's screen, with the script before and after it.</span></li>
+            <li><svg><use href="#i-check"/></svg><span><b>Speaker list</b> with progress and time for each talk.</span></li>
+            <li><svg><use href="#i-check"/></svg><span><b>Every setting one click away:</b> size, margin, speed, font, colours, timer, monitor.</span></li>
+          </ul>
+        </div>
       </div>
-      <div class="reveal">
-        <div class="monitor"><div class="screen"><img src="img/output-countdown.webp" alt="The Output window with a yellow countdown timer showing 00:48" loading="lazy"></div><div class="stand"></div><div class="foot"></div></div>
-        <div class="caption"><span class="tag blue">OUTPUT</span><span><b>What the speaker sees.</b> Big text, a red reading line and a timer, with nothing else on screen.</span></div>
+      <div class="panel tour" role="tabpanel" id="tp-output" aria-labelledby="tab-output" hidden>
+        <div class="frame"><div class="bar"><i></i><i></i><i></i><span>GlidePrompter Output</span></div><img src="img/output-countdown.webp" alt="The Output window with big text, the red reading line and a yellow countdown timer" loading="lazy" style="object-position:center"></div>
+        <div>
+          <h3 style="font-size:22px">What the speaker sees</h3>
+          <ul class="list">
+            <li><svg><use href="#i-check"/></svg><span><b>Big text and a red reading line</b>, with nothing else on screen.</span></li>
+            <li><svg><use href="#i-check"/></svg><span><b>Fullscreen on any monitor</b>, or captured in OBS as a window.</span></li>
+            <li><svg><use href="#i-check"/></svg><span><b>Mirror mode</b> for beam-splitter glass.</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel tour" role="tabpanel" id="tp-editor" aria-labelledby="tab-editor" hidden>
+        <div class="frame"><div class="bar"><i></i><i></i><i></i><span>GlidePrompter Control · Edit</span></div><img src="img/editor.webp" alt="The script editor with formatting toolbar and word statistics" loading="lazy"></div>
+        <div>
+          <h3 style="font-size:22px">Fix scripts mid-show</h3>
+          <ul class="list">
+            <li><svg><use href="#i-check"/></svg><span><b>Formatting toolbar</b> with bold, italic, underline, highlight, colours and stage cues.</span></li>
+            <li><svg><use href="#i-check"/></svg><span><b>Real undo / redo</b> across every formatting action.</span></li>
+            <li><svg><use href="#i-check"/></svg><span><b>Live stats:</b> word count, speaking time at 130 wpm and scroll time at the current speed.</span></li>
+            <li><svg><use href="#i-check"/></svg><span><b>Save without losing your place.</b> The same words stay on the reading line.</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel tour" role="tabpanel" id="tp-search" aria-labelledby="tab-search" hidden>
+        <div class="frame"><div class="bar"><i></i><i></i><i></i><span>GlidePrompter Control · Search</span></div><img src="img/search.webp" alt="Searching for 'lost your place' highlights the words in the script" loading="lazy"></div>
+        <div>
+          <h3 style="font-size:22px">Find your place by ear</h3>
+          <ul class="list">
+            <li><svg><use href="#i-check"/></svg><span><b>Type a few words</b> the speaker just said and press Enter.</span></li>
+            <li><svg><use href="#i-check"/></svg><span><b>The prompter glides</b> so those words land on the reading line.</span></li>
+            <li><svg><use href="#i-check"/></svg><span><b>Capitals, accents and punctuation</b> don't matter.</span></li>
+          </ul>
+          <a class="btn btn-outline btn-sm" href="#try" style="margin-top:20px">Try it on this page <svg><use href="#i-arrow"/></svg></a>
+        </div>
       </div>
     </div>
 
-    <div class="grid">
-      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M4 12h10M4 17h13"/></svg></div><h3>Buttery smooth scrolling</h3><p>The script moves on the GPU in a single animation loop. Tap the arrows to nudge it, or hold them to glide. Play, pause and speed changes ease in and out.</p></div>
-      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3.2 3-5 5.5-5s4.7 1.8 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.2c2.3 0 4 1.5 4.6 4"/></svg></div><h3>Per-speaker profiles</h3><p>Each speaker keeps their own text size, colours, font, speed, timer and exact position. Press <kbd>Ctrl</kbd>+<kbd>1</kbd>…<kbd>9</kbd> to switch.</p></div>
-      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></svg></div><h3>Find your place by ear</h3><p>Type a few words the speaker just said and press Enter. The prompter glides so those words land on the reading line. Capitals, accents and punctuation don't matter.</p></div>
-      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M7 5h6a3.5 3.5 0 0 1 0 7H7zm0 7h7a3.5 3.5 0 0 1 0 7H7z"/></svg></div><h3>Fonts &amp; inline formatting</h3><p>Choose a font, weight, letter spacing and line spacing. Make words <b>bold</b>, <i>italic</i>, underlined, highlighted or coloured, straight from the editor.</p></div>
-      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2M9.5 2.8h5"/></svg></div><h3>Count up or count down</h3><p>Each speaker has a target time. The timer turns yellow near the end, red at zero, and can keep counting overtime. You can type in any time or nudge it ±30 s.</p></div>
-      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><rect x="6.5" y="8.5" width="11" height="7" rx="1"/></svg></div><h3>See what the speaker sees</h3><p>The Prompter view in the Control window is an exact miniature of the Output window, with the same line breaks. A frame shows exactly what's on the speaker's screen, with the script before and after it.</p></div>
-      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3v18" stroke-dasharray="2.5 2.5"/><path d="M9 7H4v10h5M15 7h5v10h-5"/></svg></div><h3>Mirror &amp; stage cues</h3><p>Mirror the text horizontally or vertically for beam-splitter glass. <span class="cue">[PAUSE]</span> and <span class="cue slide">SLIDE 2</span> cues are styled so they're never read aloud.</p></div>
+    <div class="bento">
+      <div class="card tile wide reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M4 12h10M4 17h13"/></svg></div>
+        <h3>Buttery smooth scrolling</h3>
+        <p>The script moves on the GPU in one animation loop. Play, pause and speed changes ease in and out. Drag the slider.</p>
+        <div class="demo">
+          <div id="tpSmooth" class="tp" style="--tp-size:5cqw"></div>
+          <div class="row" style="margin-top:12px">
+            <button class="btn btn-secondary btn-sm btn-icon" id="smoothPlay" aria-label="Pause"><svg><use href="#i-pause"/></svg></button>
+            <input type="range" id="smoothSpeed" min="1" max="38" value="24" aria-label="Scroll speed" style="flex:1">
+            <span style="font-size:13px;color:var(--muted-fg);min-width:72px">Speed <b id="smoothVal" style="color:var(--fg)">24</b></span>
+          </div>
+        </div>
+      </div>
+      <div class="card tile reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3.2 3-5 5.5-5s4.7 1.8 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.2c2.3 0 4 1.5 4.6 4"/></svg></div>
+        <h3>Per-speaker profiles</h3>
+        <p>Each speaker keeps their own settings and exact position. <kbd>Ctrl</kbd> <kbd>1…9</kbd> switches.</p>
+        <div class="demo">
+          <div class="speakers" id="speakers">
+            <button aria-pressed="true" data-p="72px|Arial|speed 24|count down 05:00|left"><span class="n">1</span>Opening<span class="t">05:00</span></button>
+            <button aria-pressed="false" data-p="88px|Georgia|speed 18|count up|centred"><span class="n">2</span>Keynote<span class="t">18:00</span></button>
+            <button aria-pressed="false" data-p="64px|Verdana|speed 27|count down 03:00|mirrored"><span class="n">3</span>Panel host<span class="t">03:00</span></button>
+          </div>
+          <div class="chips" id="speakerChips"></div>
+        </div>
+      </div>
+      <div class="card tile reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></svg></div>
+        <h3>Find your place by ear</h3>
+        <p>Type a few words the speaker just said and press Enter. The prompter glides so they land on the reading line.</p>
+        <a class="more" href="#try">Try it below <svg width="14" height="14"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="card tile reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M7 5h6a3.5 3.5 0 0 1 0 7H7zm0 7h7a3.5 3.5 0 0 1 0 7H7z"/></svg></div>
+        <h3>Fonts &amp; formatting</h3>
+        <p>Choose a font, weight and spacing. Make words <b style="color:var(--fg)">bold</b>, <i>italic</i>, <u>underlined</u>, <mark style="background:rgba(255,214,10,.35);color:inherit;border-radius:3px;padding:0 2px">highlighted</mark> or <span style="color:#ff9f43">coloured</span>.</p>
+        <a class="more" href="#formatting">Open the playground <svg width="14" height="14"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="card tile reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2M9.5 2.8h5"/></svg></div>
+        <h3>Count up or count down</h3>
+        <p>Yellow near the end, red at zero, then overtime.</p>
+        <div class="demo row"><span class="tchip">04:12</span><span class="tchip warn">00:48</span><span class="tchip over">−00:12</span></div>
+      </div>
+      <div class="card tile wide reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3v18" stroke-dasharray="2.5 2.5"/><path d="M9 7H4v10h5M15 7h5v10h-5"/></svg></div>
+        <h3>Mirror &amp; stage cues</h3>
+        <p>Flip the text for beam-splitter glass. Cues like <span class="cue cue-pause" style="font-size:12px">PAUSE</span> and <span class="cue cue-slide" style="font-size:11px">SLIDE 3</span> are styled so nobody reads them aloud.</p>
+        <div class="demo">
+          <div id="tpMirror" class="tp" style="--tp-size:4.6cqw"></div>
+          <div class="row" style="margin-top:12px">
+            <button class="btn btn-outline btn-sm" id="mirH" aria-pressed="false">Mirror horizontal <kbd>H</kbd></button>
+            <button class="btn btn-outline btn-sm" id="mirV" aria-pressed="false">Mirror vertical <kbd>V</kbd></button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="formatting" style="background: linear-gradient(180deg, transparent, var(--bg2) 30%, var(--bg2) 70%, transparent)">
-  <div class="wrap split">
-    <div class="reveal">
-      <span class="eyebrow">Formatting</span>
+<section id="try" class="sep">
+  <div class="wrap">
+    <div class="center head reveal">
+      <span class="badge"><span class="dot"></span>Try it</span>
+      <h2>Lost your place? <span class="grad">Type what you heard.</span></h2>
+      <p class="lead">This is the same scrolling and search logic as the app. Search for a few words from the talk, press Enter, and the prompter glides there. Click the screen to use the keyboard shortcuts.</p>
+    </div>
+    <div class="try reveal" id="demo">
+      <div class="screen-wrap"><div id="tpDemo" class="tp" tabindex="0" aria-label="Demo prompter. Space plays and pauses, arrow keys nudge, Shift and arrows change speed."></div></div>
+      <div class="card">
+        <div class="toolbar">
+          <button class="btn btn-primary btn-sm" id="demoPlay" style="min-width:92px"><svg><use href="#i-play"/></svg><span>Play</span></button>
+          <div class="speed"><span>Speed</span><input type="range" id="demoSpeed" min="1" max="38" value="24" aria-label="Scroll speed"><b id="demoSpeedVal">24</b></div>
+          <form class="search" id="demoSearch" autocomplete="off">
+            <svg class="mag"><use href="#i-search"/></svg>
+            <input class="input" id="demoQ" type="search" placeholder="Find spoken words…   e.g. blue dot" aria-label="Find spoken words">
+            <span class="count" id="demoCount"></span>
+            <button type="button" class="btn btn-ghost btn-sm btn-icon" id="demoPrev" aria-label="Previous match"><svg><use href="#i-up"/></svg></button>
+            <button type="button" class="btn btn-ghost btn-sm btn-icon" id="demoNext" aria-label="Next match"><svg><use href="#i-chev"/></svg></button>
+          </form>
+        </div>
+        <div class="suggest">Try: <button data-q="blue dot">blue dot</button><button data-q="history of buttons">history of buttons</button><button data-q="CAFE!">CAFE! <span style="opacity:.6">(accents &amp; punctuation ignored)</span></button><button data-q="chess">chess</button></div>
+      </div>
+      <p class="hint"><kbd>Space</kbd> play / pause · <kbd>↑</kbd> <kbd>↓</kbd> nudge · <kbd>Shift</kbd> <kbd>↑</kbd> <kbd>↓</kbd> speed · <kbd>Home</kbd> start · <kbd>Ctrl</kbd> <kbd>F</kbd> search</p>
+    </div>
+  </div>
+</section>
+
+<section id="formatting" class="sep">
+  <div class="wrap">
+    <div class="center head reveal">
+      <span class="badge"><span class="dot"></span>Formatting</span>
       <h2>Emphasis the speaker <span class="grad">can't miss.</span></h2>
-      <p class="lead">Scripts stay plain <code style="font:inherit;color:#fff">.txt</code> files with one line per paragraph. A little markup turns into real formatting on the prompter. Select text and press <kbd>Ctrl</kbd>+<kbd>B</kbd>, or use the editor toolbar.</p>
-      <div class="markup">
-        <div class="row"><code class="head">You type</code><div class="out head">The speaker sees</div></div>
-        <div class="row"><code>**really**</code><div class="out"><b>really</b></div></div>
-        <div class="row"><code>*slowly*</code><div class="out"><i>slowly</i></div></div>
-        <div class="row"><code>__never__</code><div class="out"><u>never</u></div></div>
-        <div class="row"><code>==been there==</code><div class="out"><mark>been there</mark></div></div>
-        <div class="row"><code>{orange}unexpected{/}</code><div class="out" style="color:#ff9f43">unexpected</div></div>
-        <div class="row"><code>[PAUSE] [SLIDE 3]</code><div class="out"><span class="cue">PAUSE</span> <span class="cue slide">SLIDE 3</span></div></div>
+      <p class="lead">Scripts are plain .txt files with one line per paragraph. A little markup becomes real formatting on the prompter. Edit the text below, or select a word and use the toolbar or <kbd>Ctrl</kbd> <kbd>B</kbd> / <kbd>I</kbd> / <kbd>U</kbd>.</p>
+    </div>
+    <div class="play reveal">
+      <div class="card editor">
+        <div class="tools" role="toolbar" aria-label="Formatting">
+          <button class="btn btn-ghost btn-sm btn-icon" data-wrap="**" title="Bold (Ctrl+B)"><b>B</b></button>
+          <button class="btn btn-ghost btn-sm btn-icon" data-wrap="*" title="Italic (Ctrl+I)"><i style="font-family:Georgia">I</i></button>
+          <button class="btn btn-ghost btn-sm btn-icon" data-wrap="__" title="Underline (Ctrl+U)"><u>U</u></button>
+          <button class="btn btn-ghost btn-sm btn-icon" data-wrap="==" title="Highlight"><span style="background:rgba(255,214,10,.45);padding:0 4px;border-radius:3px">H</span></button>
+          <span class="sepv"></span>
+          <button class="swatch" data-color="red" title="Red"><i style="background:#ff4d4d"></i></button>
+          <button class="swatch" data-color="orange" title="Orange"><i style="background:#ff9f43"></i></button>
+          <button class="swatch" data-color="yellow" title="Yellow"><i style="background:#ffd60a"></i></button>
+          <button class="swatch" data-color="green" title="Green"><i style="background:#4cd964"></i></button>
+          <button class="swatch" data-color="blue" title="Blue"><i style="background:#5aa9ff"></i></button>
+          <button class="swatch" data-color="purple" title="Purple"><i style="background:#c084fc"></i></button>
+          <span class="sepv"></span>
+          <button class="btn btn-ghost btn-sm" data-cue="[PAUSE]"><span class="cue cue-pause" style="font-size:11px">PAUSE</span></button>
+          <button class="btn btn-ghost btn-sm" data-cue="[SLIDE 2]"><span class="cue cue-slide" style="font-size:10px">SLIDE</span></button>
+          <button class="btn btn-ghost btn-sm" data-cue="[LOOK UP]"><span class="cue cue-action" style="font-size:11px">ACTION</span></button>
+        </div>
+        <textarea id="fmtText" spellcheck="false" aria-label="Script markup"></textarea>
+        <div class="foot"><span id="fmtWords">0 words</span><span id="fmtTime">~0 s at 130 wpm</span><span style="margin-left:auto">Ctrl Z undoes formatting</span></div>
+      </div>
+      <div class="card preview">
+        <div class="cap"><span>Speaker's prompter</span><span class="badge" style="height:20px"><span class="dot"></span>Live</span></div>
+        <div id="tpFmt" class="tp" style="--tp-size:4.4cqw"></div>
       </div>
     </div>
-    <div class="reveal">
-      <div class="monitor"><div class="screen"><img src="img/output-formatting.webp" alt="The prompter showing bold, italic, underlined, highlighted and coloured words" loading="lazy"></div><div class="stand"></div><div class="foot"></div></div>
-    </div>
-  </div>
-  <div class="wrap split rev" style="margin-top: 110px">
-    <div class="reveal">
-      <span class="eyebrow">Editor</span>
-      <h2>Write and fix scripts <span class="grad">mid-show.</span></h2>
-      <ul class="list">
-        <li><svg><use href="#i-check"/></svg><span><b>Formatting toolbar</b> with bold, italic, underline, highlight, colours and one-click stage cues.</span></li>
-        <li><svg><use href="#i-check"/></svg><span><b>Real undo / redo.</b> <kbd>Ctrl</kbd>+<kbd>Z</kbd> works across every formatting action.</span></li>
-        <li><svg><use href="#i-check"/></svg><span><b>Live stats:</b> word count, speaking time at 130 wpm, and how long the scroll takes at the current speed.</span></li>
-        <li><svg><use href="#i-check"/></svg><span><b>Save without losing your place.</b> The prompter keeps the same words on the reading line.</span></li>
-      </ul>
-    </div>
-    <div class="reveal">
-      <div class="browser"><div class="bar"><i></i><i></i><i></i><span>GlidePrompter Control · Edit</span></div><img src="img/editor.webp" alt="The script editor with formatting toolbar and word statistics" loading="lazy"></div>
+    <div class="cheat reveal">
+      <div><code>**really**</code><b>really</b></div>
+      <div><code>*slowly*</code><i>slowly</i></div>
+      <div><code>__never__</code><u>never</u></div>
+      <div><code>==been there==</code><mark style="background:rgba(255,214,10,.35);color:inherit;border-radius:3px;padding:0 3px">been there</mark></div>
+      <div><code>{orange}word{/}</code><span style="color:#ff9f43">word</span></div>
+      <div><code>[PAUSE] [SLIDE 3]</code><span><span class="cue cue-pause" style="font-size:11px">PAUSE</span> <span class="cue cue-slide" style="font-size:10px">SLIDE 3</span></span></div>
     </div>
   </div>
 </section>
 
-<section id="timer">
+<section id="timer" class="sep">
   <div class="wrap split">
-    <div class="reveal livetimer">
-      <div class="monitor"><div class="screen" style="position:relative"><img src="img/output-overtime.webp" alt="Prompter with centred Georgia text and a red overtime timer" loading="lazy"></div><div class="stand"></div><div class="foot"></div></div>
+    <div class="reveal">
+      <div class="monitor"><div class="screen"><div id="tpTimer" class="tp" style="--tp-size:4.6cqw"></div></div><div class="stand"></div><div class="foot"></div></div>
     </div>
     <div class="reveal">
-      <span class="eyebrow">Timer</span>
+      <span class="badge"><span class="dot"></span>Timer</span>
       <h2>Time is <span class="grad">always visible.</span></h2>
-      <p class="lead">Switch each speaker between counting up and counting down. Set a target, a warning window, the corner and the colours. The timer changes colour on its own, so the speaker knows how much time is left without looking away.</p>
-      <div class="timers" aria-live="off">
-        <div class="tchip"><div class="lbl">Count down</div><span class="t" data-demo="down">00:00</span></div>
-        <div class="tchip"><div class="lbl">Count up</div><span class="t" data-demo="up">00:00</span></div>
+      <p class="lead">Each speaker counts up or down to their own target. The timer changes colour on its own, so the speaker knows how much time is left without looking away. Play with it:</p>
+      <div class="card ctrl">
+        <div class="r"><span class="k">Mode</span><div class="seg" id="tMode"><button aria-pressed="true" data-v="down">Count down</button><button aria-pressed="false" data-v="up">Count up</button></div></div>
+        <div class="r"><span class="k">Target</span><div class="seg" id="tTarget"><button aria-pressed="true" data-v="120">2 min</button><button aria-pressed="false" data-v="300">5 min</button><button aria-pressed="false" data-v="600">10 min</button><button aria-pressed="false" data-v="1080">18 min</button></div></div>
+        <div class="r"><span class="k">Demo speed</span><div class="seg" id="tRate"><button aria-pressed="false" data-v="1">1×</button><button aria-pressed="true" data-v="10">10×</button><button aria-pressed="false" data-v="60">60×</button></div></div>
+        <div class="r"><span class="k"></span><div class="btns">
+          <button class="btn btn-primary btn-sm" id="tStart" style="min-width:84px">Pause</button>
+          <button class="btn btn-outline btn-sm" id="tReset"><svg><use href="#i-reset"/></svg>Reset</button>
+          <button class="btn btn-outline btn-sm" id="tMinus">−30 s</button>
+          <button class="btn btn-outline btn-sm" id="tPlus">+30 s</button>
+        </div></div>
       </div>
       <ul class="list">
         <li><svg><use href="#i-check"/></svg><span><b>Yellow</b> in the last minute (adjustable), <b>red</b> at zero, then <b>−00:12</b> overtime.</span></li>
-        <li><svg><use href="#i-check"/></svg><span><b>Click the time to type a new one</b>, or nudge it by ±30 s from the toolbar.</span></li>
-        <li><svg><use href="#i-check"/></svg><span><b>Any corner, any colour.</b> The timer is saved with each speaker's profile.</span></li>
+        <li><svg><use href="#i-check"/></svg><span><b>Any corner, any colour.</b> Saved with each speaker's profile.</span></li>
       </ul>
     </div>
   </div>
 </section>
 
-<section id="setup" style="background: var(--bg2)">
+<section id="setup" class="sep" style="background: linear-gradient(180deg, transparent, #0b0b0e 20%)">
   <div class="wrap">
-    <div class="center reveal">
-      <span class="eyebrow">On stage</span>
+    <div class="center head reveal">
+      <span class="badge"><span class="dot"></span>On stage</span>
       <h2>From laptop to stage <span class="grad">in a minute.</span></h2>
       <p class="lead">Put the Output window on a confidence monitor, capture it in OBS, or both at once.</p>
     </div>
 
-    <div class="diagram reveal" role="img" aria-label="Diagram: the laptop runs GlidePrompter. The Control window stays on the laptop, the Output window goes to a stage monitor over HDMI and into OBS by window capture for the stream or recording.">
-      <svg viewBox="0 0 1000 360" fill="none" font-family="Inter, Segoe UI, sans-serif">
+    <div class="card diagram reveal" role="img" aria-label="Diagram: the laptop runs GlidePrompter. The Control window stays on the laptop, the Output window goes to a stage monitor over HDMI and into OBS by window capture for the stream or recording.">
+      <svg viewBox="0 0 1000 360" fill="none" font-family="Geist, Inter, Segoe UI, sans-serif">
         <defs>
           <linearGradient id="dg" x1="0" x2="1"><stop offset="0" stop-color="#e62b1e"/><stop offset="1" stop-color="#ff6a3d"/></linearGradient>
-          <linearGradient id="scr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b1b22"/><stop offset="1" stop-color="#0c0c10"/></linearGradient>
+          <linearGradient id="scr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b1b20"/><stop offset="1" stop-color="#0c0c0f"/></linearGradient>
         </defs>
-        <!-- laptop -->
         <g transform="translate(40 90)">
-          <rect x="0" y="0" width="240" height="150" rx="10" fill="#202027" stroke="#3a3a44"/>
+          <rect x="0" y="0" width="240" height="150" rx="10" fill="#18181b" stroke="#3f3f46"/>
           <rect x="10" y="10" width="220" height="130" rx="4" fill="url(#scr)"/>
-          <rect x="18" y="18" width="50" height="114" rx="3" fill="#18181d"/>
-          <rect x="24" y="26" width="38" height="8" rx="2" fill="#e62b1e" opacity=".8"/><rect x="24" y="40" width="38" height="6" rx="2" fill="#3a3a44"/><rect x="24" y="52" width="38" height="6" rx="2" fill="#3a3a44"/>
-          <rect x="76" y="26" width="140" height="6" rx="2" fill="#4a4a55"/><rect x="76" y="40" width="120" height="6" rx="2" fill="#4a4a55"/>
+          <rect x="18" y="18" width="50" height="114" rx="3" fill="#141417"/>
+          <rect x="24" y="26" width="38" height="8" rx="2" fill="#e62b1e" opacity=".8"/><rect x="24" y="40" width="38" height="6" rx="2" fill="#3f3f46"/><rect x="24" y="52" width="38" height="6" rx="2" fill="#3f3f46"/>
+          <rect x="76" y="26" width="140" height="6" rx="2" fill="#52525b"/><rect x="76" y="40" width="120" height="6" rx="2" fill="#52525b"/>
           <rect x="72" y="54" width="152" height="16" rx="3" fill="#2a1210" stroke="#e62b1e"/><rect x="78" y="59" width="110" height="6" rx="2" fill="#fff"/>
-          <rect x="76" y="78" width="130" height="6" rx="2" fill="#4a4a55"/><rect x="76" y="92" width="100" height="6" rx="2" fill="#4a4a55"/><rect x="76" y="106" width="136" height="6" rx="2" fill="#4a4a55"/>
-          <path d="M-18 150h276l-12 14H-6z" fill="#2c2c34"/>
-          <text x="120" y="200" text-anchor="middle" fill="#f4f4f5" font-size="17" font-weight="700">Your laptop</text>
+          <rect x="76" y="78" width="130" height="6" rx="2" fill="#52525b"/><rect x="76" y="92" width="100" height="6" rx="2" fill="#52525b"/><rect x="76" y="106" width="136" height="6" rx="2" fill="#52525b"/>
+          <path d="M-18 150h276l-12 14H-6z" fill="#27272a"/>
+          <text x="120" y="200" text-anchor="middle" fill="#fafafa" font-size="17" font-weight="600">Your laptop</text>
           <text x="120" y="222" text-anchor="middle" fill="#a1a1aa" font-size="14">Control window</text>
         </g>
-        <!-- monitor -->
         <g transform="translate(400 30)">
-          <rect x="0" y="0" width="220" height="132" rx="8" fill="#202027" stroke="#3a3a44"/>
+          <rect x="0" y="0" width="220" height="132" rx="8" fill="#18181b" stroke="#3f3f46"/>
           <rect x="8" y="8" width="204" height="116" rx="3" fill="#000"/>
           <rect x="8" y="56" width="204" height="20" fill="#fff" opacity=".05"/>
           <path d="M14 60l8 6-8 6zM206 60l-8 6 8 6z" fill="#e62b1e"/>
           <rect x="30" y="34" width="150" height="9" rx="3" fill="#fff" opacity=".55"/><rect x="30" y="61" width="160" height="10" rx="3" fill="#fff"/><rect x="30" y="88" width="120" height="9" rx="3" fill="#fff" opacity=".55"/>
           <rect x="166" y="14" width="40" height="15" rx="3" fill="#ffcc00"/><text x="186" y="25.5" text-anchor="middle" font-size="11" font-weight="800" fill="#111">00:48</text>
-          <path d="M95 132h30l6 22H89z" fill="#25252c"/><rect x="72" y="154" width="76" height="6" rx="3" fill="#2c2c34"/>
-          <text x="110" y="188" text-anchor="middle" fill="#f4f4f5" font-size="17" font-weight="700">Stage monitor</text>
+          <path d="M95 132h30l6 22H89z" fill="#1f1f23"/><rect x="72" y="154" width="76" height="6" rx="3" fill="#27272a"/>
+          <text x="110" y="188" text-anchor="middle" fill="#fafafa" font-size="17" font-weight="600">Stage monitor</text>
           <text x="110" y="210" text-anchor="middle" fill="#a1a1aa" font-size="14">Output window, fullscreen</text>
         </g>
-        <!-- OBS -->
         <g transform="translate(400 250)">
-          <rect x="0" y="0" width="220" height="70" rx="12" fill="#16161c" stroke="#3a3a44"/>
-          <circle cx="38" cy="35" r="18" fill="none" stroke="#f4f4f5" stroke-width="3"/><circle cx="38" cy="35" r="6" fill="#f4f4f5"/>
-          <text x="70" y="31" fill="#f4f4f5" font-size="16" font-weight="700">OBS Studio</text>
+          <rect x="0" y="0" width="220" height="70" rx="12" fill="#121215" stroke="#3f3f46"/>
+          <circle cx="38" cy="35" r="18" fill="none" stroke="#fafafa" stroke-width="3"/><circle cx="38" cy="35" r="6" fill="#fafafa"/>
+          <text x="70" y="31" fill="#fafafa" font-size="16" font-weight="600">OBS Studio</text>
           <text x="70" y="51" fill="#a1a1aa" font-size="13">Window Capture</text>
         </g>
-        <!-- audience / stream -->
         <g transform="translate(760 70)">
-          <rect x="0" y="0" width="200" height="110" rx="14" fill="#16161c" stroke="#3a3a44"/>
-          <circle cx="60" cy="48" r="13" fill="#4a4a55"/><path d="M36 86c3-14 13-21 24-21s21 7 24 21" fill="#4a4a55"/>
-          <circle cx="104" cy="44" r="15" fill="#6a6a77"/><path d="M76 88c3-16 15-24 28-24s25 8 28 24" fill="#6a6a77"/>
-          <circle cx="146" cy="48" r="13" fill="#4a4a55"/><path d="M122 86c3-14 13-21 24-21s21 7 24 21" fill="#4a4a55"/>
-          <text x="100" y="140" text-anchor="middle" fill="#f4f4f5" font-size="17" font-weight="700">Speaker on stage</text>
+          <rect x="0" y="0" width="200" height="110" rx="14" fill="#121215" stroke="#3f3f46"/>
+          <circle cx="60" cy="48" r="13" fill="#3f3f46"/><path d="M36 86c3-14 13-21 24-21s21 7 24 21" fill="#3f3f46"/>
+          <circle cx="104" cy="44" r="15" fill="#71717a"/><path d="M76 88c3-16 15-24 28-24s25 8 28 24" fill="#71717a"/>
+          <circle cx="146" cy="48" r="13" fill="#3f3f46"/><path d="M122 86c3-14 13-21 24-21s21 7 24 21" fill="#3f3f46"/>
+          <text x="100" y="140" text-anchor="middle" fill="#fafafa" font-size="17" font-weight="600">Speaker on stage</text>
           <text x="100" y="162" text-anchor="middle" fill="#a1a1aa" font-size="14">reads the monitor</text>
         </g>
         <g transform="translate(760 240)">
-          <rect x="0" y="0" width="200" height="90" rx="14" fill="#16161c" stroke="#3a3a44"/>
-          <rect x="18" y="18" width="70" height="54" rx="6" fill="#000" stroke="#3a3a44"/><path d="M45 36l16 9-16 9z" fill="#e62b1e"/>
-          <text x="100" y="40" fill="#f4f4f5" font-size="15" font-weight="700">Stream or</text>
-          <text x="100" y="60" fill="#f4f4f5" font-size="15" font-weight="700">recording</text>
+          <rect x="0" y="0" width="200" height="90" rx="14" fill="#121215" stroke="#3f3f46"/>
+          <rect x="18" y="18" width="70" height="54" rx="6" fill="#000" stroke="#3f3f46"/><path d="M45 36l16 9-16 9z" fill="#e62b1e"/>
+          <text x="100" y="40" fill="#fafafa" font-size="15" font-weight="600">Stream or</text>
+          <text x="100" y="60" fill="#fafafa" font-size="15" font-weight="600">recording</text>
         </g>
-        <!-- flows -->
         <path class="flow" d="M290 150 C 340 150, 350 100, 395 100" stroke="url(#dg)" stroke-width="3" stroke-linecap="round"/>
         <path class="flow" d="M290 175 C 340 175, 350 285, 395 285" stroke="url(#dg)" stroke-width="3" stroke-linecap="round"/>
         <path class="flow" d="M625 100 C 690 100, 700 125, 755 125" stroke="url(#dg)" stroke-width="3" stroke-linecap="round"/>
@@ -431,12 +658,12 @@ footer a:hover { color: #fff; }
     </div>
 
     <div class="steps">
-      <div class="step reveal"><h3>Download &amp; run</h3><p>Get <code>GlidePrompter.exe</code> and double-click it. There's nothing to install. If Windows shows "Windows protected your PC", click <b>More info → Run anyway</b>, because the app isn't code-signed.</p></div>
-      <div class="step reveal"><h3>Add your scripts</h3><p>A <code>GlidePrompter Scripts</code> folder appears next to the .exe with two sample scripts. Drop in <code>.txt</code> files (one line per paragraph) or add speakers in the app.</p></div>
-      <div class="step reveal"><h3>Go live</h3><p>Move the Output window to the stage screen and press <kbd>F</kbd>. In OBS, add a <b>Window Capture</b> of "GlidePrompter Output" with the method <i>Windows 10 (1903 and up)</i>.</p></div>
+      <div class="card step reveal"><h3>Download &amp; run</h3><p>Get <code>GlidePrompter.exe</code> and double-click it. There's nothing to install. If Windows shows "Windows protected your PC", click <b>More info → Run anyway</b>, because the app isn't code-signed.</p></div>
+      <div class="card step reveal"><h3>Add your scripts</h3><p>A <code>GlidePrompter Scripts</code> folder appears next to the .exe with two sample scripts. Drop in <code>.txt</code> files (one line per paragraph) or add speakers in the app.</p></div>
+      <div class="card step reveal"><h3>Go live</h3><p>Move the Output window to the stage screen and press <kbd>F</kbd>. In OBS, add a <b>Window Capture</b> of "GlidePrompter Output" with the method <i>Windows 10 (1903 and up)</i>.</p></div>
     </div>
 
-    <div class="compare reveal">
+    <div class="card table reveal">
       <table>
         <thead><tr><th></th><th>Windows app</th><th>Web app</th></tr></thead>
         <tbody>
@@ -451,57 +678,58 @@ footer a:hover { color: #fff; }
   </div>
 </section>
 
-<section id="shortcuts">
+<section id="shortcuts" class="sep">
   <div class="wrap">
-    <div class="center reveal">
-      <span class="eyebrow">Keyboard first</span>
+    <div class="center head reveal" style="margin-bottom:36px">
+      <span class="badge"><span class="dot"></span>Keyboard first</span>
       <h2>Run the whole show <span class="grad">from the keyboard.</span></h2>
-      <p class="lead">The shortcuts work in both windows. Press <kbd>?</kbd> in the app to see them all.</p>
+      <p class="lead">The shortcuts work in both windows. Press a key now to find it in the list.</p>
+      <div class="pressed" id="pressed" aria-live="polite">Waiting for a key…</div>
     </div>
-    <div class="keys reveal">
-      <div class="key">Play / pause<kbd>Space</kbd></div>
-      <div class="key">Nudge back / forward (hold to glide)<kbd>↑ ↓</kbd></div>
-      <div class="key">Speed +1 / −1<kbd>Shift ↑ ↓</kbd></div>
-      <div class="key">Previous / next paragraph<kbd>PgUp PgDn</kbd></div>
-      <div class="key">Start / end<kbd>Home End</kbd></div>
-      <div class="key">Find spoken words<kbd>Ctrl F</kbd></div>
-      <div class="key">Jump to next / previous match<kbd>Enter</kbd></div>
-      <div class="key">Switch speaker<kbd>Ctrl 1…9</kbd></div>
-      <div class="key">Timer start-stop / reset<kbd>T  Shift T</kbd></div>
-      <div class="key">Text size<kbd>+ −</kbd></div>
-      <div class="key">Margin<kbd>, .</kbd></div>
-      <div class="key">Mirror horizontal / vertical<kbd>H V</kbd></div>
-      <div class="key">Reading line / progress bar<kbd>L P</kbd></div>
-      <div class="key">Align left / centre<kbd>A</kbd></div>
-      <div class="key">Fullscreen output<kbd>F</kbd></div>
-      <div class="key">Bold / italic / underline (editor)<kbd>Ctrl B I U</kbd></div>
+    <div class="keys reveal" id="keys">
+      <div class="key" data-k="Space">Play / pause<kbd>Space</kbd></div>
+      <div class="key" data-k="Arr">Nudge back / forward (hold to glide)<kbd>↑ ↓</kbd></div>
+      <div class="key" data-k="SArr">Speed +1 / −1<kbd>Shift ↑ ↓</kbd></div>
+      <div class="key" data-k="Pg">Previous / next paragraph<kbd>PgUp PgDn</kbd></div>
+      <div class="key" data-k="HE">Start / end<kbd>Home End</kbd></div>
+      <div class="key" data-k="CF">Find spoken words<kbd>Ctrl F</kbd></div>
+      <div class="key" data-k="Enter">Jump to next / previous match<kbd>Enter</kbd></div>
+      <div class="key" data-k="C1">Switch speaker<kbd>Ctrl 1…9</kbd></div>
+      <div class="key" data-k="T">Timer start-stop / reset<kbd>T  Shift T</kbd></div>
+      <div class="key" data-k="PM">Text size<kbd>+ −</kbd></div>
+      <div class="key" data-k="CM">Margin<kbd>, .</kbd></div>
+      <div class="key" data-k="HV">Mirror horizontal / vertical<kbd>H V</kbd></div>
+      <div class="key" data-k="LP">Reading line / progress bar<kbd>L P</kbd></div>
+      <div class="key" data-k="A">Align left / centre<kbd>A</kbd></div>
+      <div class="key" data-k="F">Fullscreen output<kbd>F</kbd></div>
+      <div class="key" data-k="CB">Bold / italic / underline (editor)<kbd>Ctrl B I U</kbd></div>
     </div>
   </div>
 </section>
 
-<section id="faq" style="padding-top: 40px">
+<section id="faq" class="sep">
   <div class="wrap">
-    <div class="center reveal"><span class="eyebrow">FAQ</span><h2>Questions</h2></div>
-    <div class="faq reveal">
-      <details><summary>Is it really free?</summary><p>Yes. GlidePrompter is open source under the MIT license, with no account, ads or tracking. The web version stores your scripts only in your own browser.</p></details>
-      <details><summary>Why does Windows warn me when I start the .exe?</summary><p>The app isn't code-signed, because signing certificates are expensive. Click <b>More info → Run anyway</b>. You can also read the source on GitHub and build the .exe yourself with <code style="font:13px var(--mono)">npm run dist</code>.</p></details>
-      <details><summary>What does a script file look like?</summary><p>It's a plain <code style="font:13px var(--mono)">.txt</code> file where every line is one paragraph. Name it like <code style="font:13px var(--mono)">3_Jane_Doe.txt</code>. The number sets the order and the <kbd>Ctrl</kbd>+<kbd>3</kbd> shortcut. Cues go in [BRACKETS] and formatting uses the markup shown above. Files that end each line with <code style="font:13px var(--mono)">&lt;br&gt;</code> (CuePrompter's paste format) also work.</p></details>
-      <details><summary>The web version stops scrolling when I cover the prompter window. Why?</summary><p>Browsers pause windows that are minimised or fully covered, to save power. Put the prompter window on a second screen or next to the control window. GlidePrompter shows a warning when this happens. The Windows app turns this pausing off, so it stays smooth even when OBS captures a hidden window.</p></details>
-      <details><summary>Can I use it with a beam-splitter / glass teleprompter?</summary><p>Yes. Press <kbd>H</kbd> to mirror horizontally (and <kbd>V</kbd> for vertically). Each speaker remembers this setting.</p></details>
-      <details><summary>Does it run on macOS or Linux?</summary><p>The web app runs in any modern browser on any system. The desktop build is for Windows, but it's an Electron app, so <code style="font:13px var(--mono)">npm start</code> from source works on macOS and Linux too.</p></details>
+    <div class="center head reveal"><span class="badge"><span class="dot"></span>FAQ</span><h2>Questions</h2></div>
+    <div class="acc reveal" id="acc">
+      <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Is it really free?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>Yes. GlidePrompter is open source under the MIT license, with no account, ads or tracking. The web version stores your scripts only in your own browser.</p></div></div></div>
+      <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Why does Windows warn me when I start the .exe?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>The app isn't code-signed, because signing certificates are expensive. Click <b>More info → Run anyway</b>. You can also read the source on GitHub and build the .exe yourself with <code>npm run dist</code>.</p></div></div></div>
+      <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>What does a script file look like?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>It's a plain <code>.txt</code> file where every line is one paragraph. Name it like <code>3_Jane_Doe.txt</code>. The number sets the order and the <kbd>Ctrl</kbd> <kbd>3</kbd> shortcut. Cues go in [BRACKETS] and formatting uses the markup shown above. Files that end each line with <code>&lt;br&gt;</code> (CuePrompter's paste format) also work.</p></div></div></div>
+      <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>The web version stops scrolling when I cover the prompter window. Why?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>Browsers pause windows that are minimised or fully covered, to save power. Put the prompter window on a second screen or next to the control window. GlidePrompter shows a warning when this happens. The Windows app turns this pausing off, so it stays smooth even when OBS captures a hidden window.</p></div></div></div>
+      <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Can I use it with a beam-splitter / glass teleprompter?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>Yes. Press <kbd>H</kbd> to mirror horizontally (and <kbd>V</kbd> for vertically). Each speaker remembers this setting.</p></div></div></div>
+      <div class="acc-item"><h3><button class="acc-trigger" aria-expanded="false"><span>Is there a macOS or Linux version?</span><svg><use href="#i-chev"/></svg></button></h3><div class="acc-panel"><div><p>Not as a desktop download yet. They're planned in <a href="https://github.com/AmineChr54/glideprompter/issues/1">#1 (macOS)</a> and <a href="https://github.com/AmineChr54/glideprompter/issues/2">#2 (Linux)</a>. Until then, the web app runs in any modern browser on any system, and <code>npm start</code> from the source code works on macOS and Linux too.</p></div></div></div>
     </div>
   </div>
 </section>
 
-<section class="final">
+<section class="final sep">
   <div class="wrap reveal">
     <img class="logo" src="img/logo-256.png" alt="GlidePrompter logo">
     <h2>Ready when your speaker is.</h2>
     <p class="lead" style="margin: 0 auto">Download the Windows app or open it in your browser. Both include two sample scripts, so you can try everything right away.</p>
-    <div class="cta">
-      <a class="btn primary big" href="https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter.exe"><svg><use href="#i-down"/></svg> Download GlidePrompter.exe <small>Windows 10 / 11 · x64</small></a>
-      <a class="btn big" href="app/" target="_blank" rel="noopener"><svg><use href="#i-globe"/></svg> Open web app</a>
-      <a class="btn big" href="https://github.com/AmineChr54/glideprompter"><svg><use href="#i-gh"/></svg> Source on GitHub</a>
+    <div class="cta" id="finalCta">
+      <a class="btn btn-primary btn-lg" data-cta="win" href="https://github.com/AmineChr54/glideprompter/releases/latest/download/GlidePrompter.exe"><svg><use href="#i-down"/></svg>Download GlidePrompter.exe <small style="opacity:.75;font-weight:400">Windows 10 / 11</small></a>
+      <a class="btn btn-outline btn-lg" data-cta="web" href="app/" target="_blank" rel="noopener"><svg><use href="#i-globe"/></svg>Open web app</a>
+      <a class="btn btn-ghost btn-lg" href="https://github.com/AmineChr54/glideprompter"><svg><use href="#i-gh"/></svg>Source on GitHub</a>
     </div>
   </div>
 </section>
@@ -515,30 +743,345 @@ footer a:hover { color: #fff; }
 </footer>
 
 <script>
-// Scroll reveal
 (() => {
-  const els = document.querySelectorAll('.reveal');
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const svgUse = id => `<svg><use href="#${id}"/></svg>`;
+
+/* ---------- OS-aware download buttons ---------- */
+(() => {
+  const ua = navigator.userAgent, plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+  const mobile = /android|iphone|ipad|ipod|mobile/i.test(ua) || (/mac/i.test(plat) && navigator.maxTouchPoints > 1);
+  const mac = !mobile && /mac/i.test(plat), linux = !mobile && /linux/i.test(plat) && !/android/i.test(ua);
+  if (!mac && !linux && !mobile) return;
+  const os = mac ? 'macOS' : linux ? 'Linux' : 'your phone or tablet';
+  for (const id of ['heroCta', 'finalCta']) {
+    const box = $('#' + id), win = $('[data-cta=win]', box), web = $('[data-cta=web]', box);
+    win.className = 'btn btn-outline btn-lg'; web.className = 'btn btn-primary btn-lg';
+    box.insertBefore(web, win);
+  }
+  const navBtn = $('[data-os-primary]');
+  navBtn.href = 'app/'; navBtn.target = '_blank'; navBtn.rel = 'noopener'; navBtn.textContent = 'Open web app';
+  const note = $('#osNote');
+  note.innerHTML = mobile
+    ? 'GlidePrompter works best on a laptop with a second screen, but you can try the web app right here.'
+    : `On ${os}? The desktop app is on the way (<a href="https://github.com/AmineChr54/glideprompter/issues/${mac ? 1 : 2}">#${mac ? 1 : 2}</a>). The web app works on ${os} today.`;
+  note.hidden = false;
+})();
+
+/* ---------- scroll reveal ---------- */
+(() => {
+  const els = $$('.reveal');
   if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('in')); return; }
-  const io = new IntersectionObserver((entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -6% 0px' });
   els.forEach(e => io.observe(e));
 })();
-// Timer demos: same rules as the app (target 1:10, warn 60 s, overtime on), sped up.
-(() => {
-  const p2 = n => String(n).padStart(2, '0');
-  const clock = s => `${p2(Math.floor(s / 60))}:${p2(s % 60)}`;
-  const target = 70, warn = 60;
-  let el = 0;
-  const down = document.querySelector('[data-demo=down]'), up = document.querySelector('[data-demo=up]');
-  function tick() {
-    const left = target - el;
-    down.textContent = left > 0 ? clock(left) : left === 0 ? '00:00' : '-' + clock(-left);
-    down.className = 't' + (left <= 0 ? ' over' : left <= warn ? ' warn' : '');
-    up.textContent = clock(el);
-    up.className = 't' + (el >= target ? ' over' : el > 0 && el >= target - warn ? ' warn' : '');
-    el = el >= target + 12 ? 0 : el + 1;
+
+/* ---------- tabs ---------- */
+$$('[data-tabs]').forEach(root => {
+  const tabs = $$('[role=tab]', root);
+  const select = (t, focus) => {
+    tabs.forEach(x => { const on = x === t; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; const p = document.getElementById(x.getAttribute('aria-controls')); p.hidden = !on; p.classList.toggle('show', on); });
+    if (focus) t.focus();
+  };
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => select(t));
+    t.addEventListener('keydown', e => {
+      const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (d) { e.preventDefault(); select(tabs[(i + d + tabs.length) % tabs.length], true); }
+    });
+  });
+});
+
+/* ---------- accordion (single open, collapsible) ---------- */
+$$('#acc .acc-trigger').forEach(btn => btn.addEventListener('click', () => {
+  const open = btn.getAttribute('aria-expanded') !== 'true';
+  $$('#acc .acc-trigger').forEach(b => { b.setAttribute('aria-expanded', 'false'); b.closest('.acc-item').querySelector('.acc-panel').classList.remove('open'); });
+  if (open) { btn.setAttribute('aria-expanded', 'true'); btn.closest('.acc-item').querySelector('.acc-panel').classList.add('open'); }
+}));
+
+/* ---------- script markup (same rules as shared/parse.js in the app) ---------- */
+const COLORS = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'white', 'gray'];
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const cueClass = inner => { const u = inner.toUpperCase(); return /^SLIDE\b/.test(u) ? 'cue cue-slide' : /^(PAUSE|WAIT|BREATHE|BEAT|SILENCE)\b/.test(u) ? 'cue cue-pause' : 'cue cue-action'; };
+const formatHtml = h => h
+  .replace(/\{(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?|[a-z]+)\}(.*?)\{\/\}/g, (m, c, t) => c[0] === '#' ? `<span style="color:${c}">${t}</span>` : COLORS.includes(c) ? `<span class="fc-${c}">${t}</span>` : m)
+  .replace(/\*\*(?=\S)(.+?)\*\*/g, '<b>$1</b>').replace(/__(?=\S)(.+?)__/g, '<u>$1</u>').replace(/==(?=\S)(.+?)==/g, '<mark>$1</mark>')
+  .replace(/\*(?=[^\s*])([^*]*?[^\s*])\*/g, '<i>$1</i>');
+const lineToHtml = line => line.trim() === '' ? '&nbsp;' : formatHtml(esc(line)).replace(/\[([^\]]+)\]/g, (_, inner) => `<span class="${cueClass(inner)}">${inner.trim()}</span>`);
+const plainWords = line => String(line).replace(/\[[^\]]*\]/g, ' ').replace(/\{[^}]*\}/g, ' ').replace(/\*\*|__|==|\*/g, '').split(/\s+/).filter(w => /[\p{L}\p{N}]/u.test(w)).length;
+const normChar = c => /\s/.test(c) ? ' ' : c.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+function normQuery(q) { let out = '', sp = true; for (const ch of String(q || '')) { const n = normChar(ch); if (!n) continue; if (n === ' ') { if (sp) continue; sp = true; } else sp = false; out += n; } return out.trim(); }
+function findAll(el, query) {
+  const q = normQuery(query); if (!q) return [];
+  let s = '', map = [], sp = true;
+  const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  for (let node = w.nextNode(); node; node = w.nextNode()) {
+    const t = node.nodeValue;
+    for (let i = 0; i < t.length; i++) { const n = normChar(t[i]); if (!n) continue; if (n === ' ') { if (sp) continue; sp = true; } else sp = false; for (const ch of n) { s += ch; map.push([node, i]); } }
+    if (!sp) { s += ' '; map.push([node, t.length - 1]); sp = true; }
   }
-  tick();
-  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(tick, 160);
+  const out = [];
+  for (let i = s.indexOf(q); i !== -1; i = s.indexOf(q, i + q.length)) {
+    const a = map[i], b = map[i + q.length - 1], r = document.createRange();
+    r.setStart(a[0], a[1]); r.setEnd(b[0], Math.min(b[1] + 1, b[0].nodeValue.length)); out.push(r);
+  }
+  return out;
+}
+
+/* ---------- mini prompter: same geometry as the Output window ---------- */
+const prompters = new Set();
+class TP {
+  constructor(root, { lines = [], speed = 24, timer = false, progress = true, startLine = 0 } = {}) {
+    this.root = root; this.speed = speed; this.playing = false; this.v = 0; this.pos = 0; this.glide = null; this.visible = false;
+    root.innerHTML = `<div class="tp-stage"><div class="tp-view"><div class="tp-content"></div></div><div class="tp-guide"><i class="l"></i><i class="r"></i></div>${timer ? '<div class="tp-timer">00:00</div>' : ''}${progress ? '<div class="tp-progress"><i></i></div>' : ''}</div>`;
+    this.stage = $('.tp-stage', root); this.content = $('.tp-content', root); this.timerEl = $('.tp-timer', root); this.prog = $('.tp-progress i', root);
+    this.setLines(lines);
+    new ResizeObserver(() => this.measure()).observe(root);
+    new IntersectionObserver(es => { this.visible = es[0].isIntersecting; if (this.visible && this.onVisible) this.onVisible(); }).observe(root);
+    prompters.add(this);
+  }
+  setLines(lines) { this.content.innerHTML = lines.map(l => `<p>${lineToHtml(l)}</p>`).join(''); this.measure(); }
+  measure() {
+    this.W = this.root.clientWidth; this.H = this.root.clientHeight;
+    this.lineH = parseFloat(getComputedStyle(this.content).fontSize) * 1.8;
+    this.max = Math.max(0, this.content.scrollHeight - this.lineH);
+    this.render();
+  }
+  render() {
+    const y = this.H * 0.35 - this.lineH / 2 - this.pos;
+    this.content.style.transform = `translate3d(0,${y.toFixed(2)}px,0)`;
+    if (this.prog) this.prog.style.transform = `scaleX(${this.max ? Math.min(1, this.pos / this.max) : 0})`;
+  }
+  pxPerSec() { return 1000 / (40 - this.speed) * (this.W / 1920); }   // app: 1 px every (40 - speed) ms on a 1920 px output
+  glideTo(p) { this.glide = Math.max(0, Math.min(p, this.max)); if (reduced) { this.pos = this.glide; this.glide = null; this.render(); } }
+  nudge(dir) { this.glideTo((this.glide ?? this.pos) + dir * this.lineH); }
+  tick(dt) {
+    const target = this.playing ? this.pxPerSec() : 0;
+    this.v += (target - this.v) * (1 - Math.exp(-dt * 5));
+    if (this.glide != null) {
+      const d = this.glide - this.pos; this.pos += d * (1 - Math.exp(-dt * 7));
+      if (Math.abs(d) < .4) { this.pos = this.glide; this.glide = null; }
+    } else if (Math.abs(this.v) > .01) {
+      this.pos += this.v * dt;
+      if (this.pos >= this.max) { this.pos = this.max; if (this.loop) setTimeout(() => this.glideTo(0), 700); else this.setPlaying(false); }
+    }
+    this.render();
+  }
+  setPlaying(on) { this.playing = on; if (this.onPlay) this.onPlay(on); }
+  rangeY(r) { const a = r.getBoundingClientRect(), c = this.content.getBoundingClientRect(); return a.top - c.top + a.height / 2; }
+}
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  for (const p of prompters) if (p.visible && (p.playing || p.glide != null || Math.abs(p.v) > .01)) p.tick(dt);
+  if (timerTick) timerTick(dt);
+  requestAnimationFrame(loop);
+}
+let timerTick = null;
+
+const TALK = `[WALK TO CENTRE] [PAUSE]
+Three years ago, I got **completely lost** in a city I had lived in for a decade. [PAUSE]
+My phone had died. No map, no blue dot, no friendly voice telling me to turn left in two hundred metres.
+And for the first ten minutes, I was honestly a little scared. [BREATHE]
+Then something strange happened. I started to *look*.
+[SLIDE 2]
+I noticed a bakery I had walked past a hundred times without seeing. A mural on the side of a parking garage. An old man teaching his granddaughter to play chess on a folding table.
+I had been living in this city, but I had never really ==been there==.
+[SLIDE 3]
+Today I want to talk about why we should all get lost a little more often. [PAUSE]
+Here is the problem. We have become *incredibly* good at not getting lost.
+We optimise every route. We read reviews before we pick a café. We know the weather, the traffic and the waiting time before we leave the house.
+And that is useful. I am not here to tell you to throw your phone into a lake. [SMILE]
+But researchers who study navigation have found something worth thinking about.
+When we follow turn-by-turn directions, the parts of our brain that build mental maps get very quiet.
+We arrive, but we do not really know where we are. [PAUSE]
+[SLIDE 4]
+I think the same thing happens in the rest of our lives.
+[SLOW] Getting lost forces us to pay attention. [PAUSE]
+It turns a route into a place. It turns a schedule into an experience.
+[SLIDE 5]
+So after that day, I started a small experiment. Once a week, I go somewhere **without a plan**.
+I take a bus I have never taken. I get off at a stop that sounds interesting. I walk until something surprises me.
+I have found a tiny museum about the history of buttons. [SMILE]
+I have eaten the best soup of my life in a place with no sign on the door.
+Because when you are lost, you have to ask. And when you ask, people help. [BREATHE]
+[SLIDE 6]
+The key is to leave a little room for the {orange}unexpected{/}.
+So here is my challenge for you. [LOOK UP]
+Sometime this week, put your phone in your pocket, pick a direction, and walk for twenty minutes.
+No destination. No reviews. No blue dot.
+You might find a bakery. You might find a mural. You might find a chess game. [PAUSE]
+**Thank you.** [BOW]`.split('\n');
+
+/* ---------- bento: smooth scrolling ---------- */
+(() => {
+  const tp = new TP($('#tpSmooth'), { lines: TALK.slice(1, 9), speed: 24 });
+  tp.loop = true;
+  const btn = $('#smoothPlay'), sl = $('#smoothSpeed'), val = $('#smoothVal');
+  tp.onPlay = on => { btn.innerHTML = svgUse(on ? 'i-pause' : 'i-play'); btn.setAttribute('aria-label', on ? 'Pause' : 'Play'); };
+  tp.setPlaying(!reduced);
+  btn.onclick = () => tp.setPlaying(!tp.playing);
+  const fill = () => sl.style.setProperty('--fill', ((sl.value - sl.min) / (sl.max - sl.min) * 100) + '%');
+  sl.oninput = () => { tp.speed = +sl.value; val.textContent = sl.value; fill(); }; fill();
+})();
+
+/* ---------- bento: speaker profiles ---------- */
+(() => {
+  const btns = $$('#speakers button'), chips = $('#speakerChips');
+  const show = b => { btns.forEach(x => x.setAttribute('aria-pressed', x === b)); chips.innerHTML = b.dataset.p.split('|').map(t => `<span>${t}</span>`).join(''); };
+  btns.forEach(b => b.onclick = () => show(b)); show(btns[0]);
+})();
+
+/* ---------- bento: mirror ---------- */
+(() => {
+  const tp = new TP($('#tpMirror'), { lines: ['I had been living in this city, [PAUSE]', 'but I had never really ==been there==.', '[SLIDE 3]'], progress: false });
+  const set = (b, cls) => { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', on); tp.stage.classList.toggle(cls, on); };
+  $('#mirH').onclick = e => set(e.currentTarget, 'mh'); $('#mirV').onclick = e => set(e.currentTarget, 'mv');
+  window.__mirror = k => set($(k === 'h' ? '#mirH' : '#mirV'), k === 'h' ? 'mh' : 'mv');
+})();
+
+/* ---------- try it: search demo ---------- */
+(() => {
+  const root = $('#tpDemo'), tp = new TP(root, { lines: TALK, speed: 24, timer: true });
+  const play = $('#demoPlay'), sl = $('#demoSpeed'), sv = $('#demoSpeedVal'), q = $('#demoQ'), count = $('#demoCount');
+  let ranges = [], idx = -1, started = false, el = 0;
+  tp.loop = true;
+  tp.onPlay = on => { play.innerHTML = svgUse(on ? 'i-pause' : 'i-play') + `<span>${on ? 'Pause' : 'Play'}</span>`; };
+  tp.onVisible = () => { if (!started && !reduced) { started = true; tp.setPlaying(true); } };
+  const fill = () => sl.style.setProperty('--fill', ((sl.value - sl.min) / (sl.max - sl.min) * 100) + '%');
+  const setSpeed = s => { s = Math.max(1, Math.min(38, s)); tp.speed = s; sl.value = s; sv.textContent = s; fill(); };
+  sl.oninput = () => setSpeed(+sl.value); fill();
+  play.onclick = () => tp.setPlaying(!tp.playing);
+  const hl = (name, rs) => { if (window.CSS && CSS.highlights) { if (rs.length) CSS.highlights.set(name, new Highlight(...rs)); else CSS.highlights.delete(name); } };
+  function update() {
+    ranges = findAll(tp.content, q.value); idx = -1;
+    hl('tp-hit', ranges); hl('tp-cur', []);
+    count.textContent = q.value.trim() ? (ranges.length ? `0/${ranges.length}` : '0/0') : '';
+  }
+  function go(dir) {
+    if (!ranges.length) { update(); if (!ranges.length) return; }
+    if (idx === -1) {   // first jump: nearest match after the reading line
+      const cur = tp.pos + tp.lineH / 2;
+      idx = ranges.findIndex(r => tp.rangeY(r) > cur + 2);
+      if (idx === -1) idx = 0;
+      if (dir < 0) idx = (idx - 1 + ranges.length) % ranges.length;
+    } else idx = (idx + dir + ranges.length) % ranges.length;
+    const r = ranges[idx];
+    hl('tp-cur', [r]);
+    count.textContent = `${idx + 1}/${ranges.length}`;
+    tp.glideTo(tp.rangeY(r) - tp.lineH / 2);
+  }
+  q.addEventListener('input', update);
+  $('#demoSearch').addEventListener('submit', e => { e.preventDefault(); go(1); });
+  q.addEventListener('keydown', e => { if (e.key === 'Enter' && e.shiftKey) { e.preventDefault(); go(-1); } if (e.key === 'Escape') { q.value = ''; update(); root.focus(); } });
+  $('#demoNext').onclick = () => go(1); $('#demoPrev').onclick = () => go(-1);
+  $$('.suggest button').forEach(b => b.onclick = () => { q.value = b.dataset.q; update(); go(1); });
+  root.addEventListener('click', () => root.focus());
+  root.addEventListener('keydown', e => {
+    const k = e.key; let used = true;
+    if (k === ' ') tp.setPlaying(!tp.playing);
+    else if (k === 'ArrowUp' || k === 'ArrowDown') { const d = k === 'ArrowUp' ? -1 : 1; e.shiftKey ? setSpeed(tp.speed - d) : tp.nudge(d); }
+    else if (k === 'Home') tp.glideTo(0); else if (k === 'End') tp.glideTo(tp.max);
+    else if ((e.ctrlKey || e.metaKey) && /^f$/i.test(k)) q.focus();
+    else used = false;
+    if (used) e.preventDefault();
+  });
+  // speaker timer in the corner: counts down from 05:00 while playing
+  const p2 = n => String(n).padStart(2, '0');
+  const prev = timerTick;
+  timerTick = dt => { if (prev) prev(dt);
+    if (tp.playing && tp.visible) el += dt;
+    const left = Math.max(0, 300 - el), s = Math.ceil(left);
+    tp.timerEl.textContent = `${p2(Math.floor(s / 60))}:${p2(s % 60)}`;
+  };
+})();
+
+/* ---------- formatting playground ---------- */
+(() => {
+  const ta = $('#fmtText'), tp = new TP($('#tpFmt'), { lines: [], progress: false });
+  ta.value = `I had been living in this city, but I had never really ==been there==. [PAUSE]\n[SLIDE 3]\nGetting lost forces us to **pay attention**.\nLeave a little room for the {orange}unexpected{/}.`;
+  const render = () => {
+    const lines = ta.value.split('\n'); tp.setLines(lines);
+    const w = lines.reduce((n, l) => n + plainWords(l), 0);
+    $('#fmtWords').textContent = `${w} word${w === 1 ? '' : 's'}`;
+    $('#fmtTime').textContent = `~${Math.round(w / 130 * 60)} s at 130 wpm`;
+  };
+  ta.addEventListener('input', render); render();
+  const insert = text => { ta.focus(); if (!document.execCommand || !document.execCommand('insertText', false, text)) { ta.setRangeText(text, ta.selectionStart, ta.selectionEnd, 'end'); render(); } };
+  function wrap(a, b = a) {
+    let s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+    if (s === e) { while (s > 0 && /\S/.test(v[s - 1])) s--; while (e < v.length && /\S/.test(v[e])) e++; if (s === e) { insert(a + 'text' + b); return; } }
+    ta.setSelectionRange(s, e);
+    const sel = v.slice(s, e); insert(a + sel + b); ta.setSelectionRange(s + a.length, s + a.length + sel.length);
+  }
+  $$('[data-wrap]').forEach(btn => btn.onclick = () => wrap(btn.dataset.wrap));
+  $$('[data-color]').forEach(btn => btn.onclick = () => wrap(`{${btn.dataset.color}}`, '{/}'));
+  $$('[data-cue]').forEach(btn => btn.onclick = () => { const v = ta.value, p = ta.selectionEnd; insert((p > 0 && !/\s/.test(v[p - 1]) ? ' ' : '') + btn.dataset.cue); });
+  ta.addEventListener('keydown', e => {
+    if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+    const m = { b: '**', i: '*', u: '__' }[e.key.toLowerCase()];
+    if (m) { e.preventDefault(); wrap(m); }
+  });
+})();
+
+/* ---------- timer playground ---------- */
+(() => {
+  const tp = new TP($('#tpTimer'), { lines: TALK.slice(6, 12), timer: true, progress: true });
+  tp.pos = Math.min(tp.max, tp.lineH * 2); tp.render();
+  const T = { mode: 'down', target: 120, warn: 60, el: 0, running: !reduced, rate: 10, touched: false };
+  const p2 = n => String(n).padStart(2, '0'), clock = s => `${p2(Math.floor(s / 60))}:${p2(s % 60)}`;
+  const start = $('#tStart');
+  function draw() {
+    let text, cls = '';
+    if (T.mode === 'down') {
+      const left = T.target - T.el;
+      text = left > 0 ? clock(Math.ceil(left)) : left > -1 ? '00:00' : '−' + clock(Math.floor(-left));
+      cls = left <= 0 ? 'over' : left <= T.warn ? 'warn' : '';
+    } else {
+      text = clock(Math.floor(T.el)); cls = T.el >= T.target ? 'over' : T.el >= T.target - T.warn ? 'warn' : '';
+    }
+    tp.timerEl.textContent = text; tp.timerEl.className = 'tp-timer' + (cls ? ' ' + cls : '');
+    start.textContent = T.running ? 'Pause' : 'Start';
+  }
+  const prev = timerTick;
+  timerTick = dt => { if (prev) prev(dt);
+    if (T.running && tp.visible) { T.el += dt * T.rate; if (!T.touched && T.el > T.target + 15) T.el = 0; draw(); }
+  };
+  const seg = (id, fn) => $$(`#${id} button`).forEach(b => b.onclick = () => { $$(`#${id} button`).forEach(x => x.setAttribute('aria-pressed', x === b)); T.touched = true; fn(b.dataset.v); draw(); });
+  seg('tMode', v => { T.mode = v; });
+  seg('tTarget', v => { T.target = +v; T.el = 0; });
+  seg('tRate', v => { T.rate = +v; });
+  start.onclick = () => { T.running = !T.running; T.touched = true; draw(); };
+  $('#tReset').onclick = () => { T.el = 0; T.touched = true; draw(); };
+  $('#tPlus').onclick = () => { T.el = Math.max(0, T.el + (T.mode === 'down' ? -30 : 30)); T.touched = true; draw(); };
+  $('#tMinus').onclick = () => { T.el = Math.max(0, T.el + (T.mode === 'down' ? 30 : -30)); T.touched = true; draw(); };
+  draw();
+})();
+
+/* ---------- shortcuts: press a key to find it ---------- */
+(() => {
+  const sec = $('#shortcuts'), out = $('#pressed'); let inView = false, t;
+  new IntersectionObserver(es => inView = es[0].isIntersecting, { threshold: .15 }).observe(sec);
+  const id = e => {
+    const k = e.key;
+    if (e.ctrlKey || e.metaKey) return /^[1-9]$/.test(k) ? 'C1' : /^f$/i.test(k) ? 'CF' : /^[biu]$/i.test(k) ? 'CB' : null;
+    if (k === ' ') return 'Space';
+    if (k === 'ArrowUp' || k === 'ArrowDown') return e.shiftKey ? 'SArr' : 'Arr';
+    return { PageUp: 'Pg', PageDown: 'Pg', Home: 'HE', End: 'HE', Enter: 'Enter', '+': 'PM', '-': 'PM', '=': 'PM', ',': 'CM', '.': 'CM' }[k]
+      || (/^t$/i.test(k) ? 'T' : /^[hv]$/i.test(k) ? 'HV' : /^[lp]$/i.test(k) ? 'LP' : /^a$/i.test(k) ? 'A' : /^f$/i.test(k) ? 'F' : null);
+  };
+  document.addEventListener('keydown', e => {
+    if (!inView || e.target.closest('input, textarea, .tp, button, [role=tab]')) return;
+    const k = id(e); if (!k) return;
+    const row = $(`#keys [data-k="${k}"]`); if (!row) return;
+    $$('#keys .key.hit').forEach(r => r.classList.remove('hit')); row.classList.add('hit');
+    out.innerHTML = `<kbd>${e.key === ' ' ? 'Space' : esc(e.key)}</kbd> ${esc(row.firstChild.textContent.trim())}`;
+    clearTimeout(t); t = setTimeout(() => row.classList.remove('hit'), 1400);
+  });
+})();
+
+requestAnimationFrame(loop);
 })();
 </script>
 </body>
